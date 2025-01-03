@@ -4,16 +4,56 @@
     <meta charset="UTF-8">
     <title>Remédios do Dia</title>
     <style>
-        /* Styles remain unchanged */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #loading {
+            display: none;
+            font-size: 16px;
+            color: #007bff;
+        }
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .upload-link {
+            text-decoration: underline;
+            cursor: pointer;
+            color: #007bff;
+        }
+        .upload-link:hover {
+            color: #0056b3;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <h1>Remédios do Dia</h1>
     <a href="#" id="uploadLink" onclick="triggerUpload(); return false;" class="upload-link">Clique aqui para carregar a foto da receita</a>
     <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect(event)" accept="image/*">
-    <div id="loading">Processando imagem...</div>
+    <div id="loading">Processando imagem, por favor aguarde...</div>
     <img id="preview" style="max-width: 400px; margin-top: 20px;" />
-    <table id="medicationTable" border="1">
+    <table id="medicationTable">
         <thead>
             <tr>
                 <th>Medicação</th>
@@ -29,9 +69,8 @@
     <button onclick="resetApp()">Limpar Lista</button>
     <script src="https://unpkg.com/tesseract.js@2.1.3/dist/tesseract.min.js"></script>
     <script>
-        // Custom JavaScript functions
         String.prototype.startsWithCapitalLetter = function() {
-            return this.charAt(0) === this.charAt(0).toUpperCase() && this.charAt(0).match(/[A-Z]/i);
+            return this.charAt(0).toUpperCase() === this.charAt(0) && /[A-ZÁÉÍÓÚÀÈÌÒÙÇ]/.test(this.charAt(0));
         };
 
         function containsUnit(line) {
@@ -39,18 +78,15 @@
             return units.some(unit => line.toLowerCase().includes(unit));
         }
 
-        // Function to delete a medication entry
         function deleteMedication(button) {
             const row = button.parentNode.parentNode;
             row.parentNode.removeChild(row);
         }
 
-        // Function to trigger file input click
         function triggerUpload() {
             document.getElementById('fileInput').click();
         }
 
-        // Handle file selection
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
@@ -63,7 +99,6 @@
             }
         }
 
-        // Process the uploaded image with OCR
         function processImage(file) {
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
@@ -73,102 +108,71 @@
                 img.src = e.target.result;
                 img.onload = () => {
                     Tesseract.recognize(img, 'por')
-                        .then(function(result) {
+                        .then(result => {
                             loading.style.display = 'none';
                             const text = result.data.text;
-                            console.log('OCR text:', text);
                             const medications = parsePrescription(text);
                             displayMedications(medications);
                         })
-                        .catch(function(err) {
+                        .catch(err => {
                             loading.style.display = 'none';
-                            console.error('OCR error:', err);
-                            alert('Ocorreu um erro ao processar a imagem. Por favor, tente novamente.');
+                            console.error('Erro no OCR:', err);
+                            alert('Erro ao processar a imagem. Verifique a qualidade da foto.');
                         });
                 };
             };
             reader.readAsDataURL(file);
         }
 
-        // Parse prescription text and extract medication information
         function parsePrescription(text) {
-            const lines = text.split('\n');
-            let date = '';
-            let medications = [];
-            let currentMedication = null;
+            const lines = text.split('\n').map(line => line.trim());
+            const medications = [];
             const datePattern = /\b\d{2}\/\d{2}\/\d{4}\b/;
+            let currentMedication = null;
 
-            // Find the date in the OCR text
-            for (let i = 0; i < lines.length; i++) {
-                if (lines[i] && datePattern.test(lines[i])) {
-                    date = lines[i].match(datePattern)[0];
-                    break;
-                }
-            }
+            let date = lines.find(line => datePattern.test(line))?.match(datePattern)?.[0] || 'Não informada';
 
-            // Iterate through lines to find medication entries
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
+            for (const line of lines) {
                 if (!line) continue;
 
-                // Check if the line contains a medication name
                 if (line.startsWithCapitalLetter() && containsUnit(line)) {
-                    if (currentMedication) {
-                        medications.push(currentMedication);
-                    }
+                    if (currentMedication) medications.push(currentMedication);
+
                     currentMedication = {
                         name: line,
-                        posology: []
+                        posology: [],
+                        date
                     };
                 } else if (currentMedication) {
-                    // Check if the next line starts a new medication
-                    if (i + 1 < lines.length && lines[i+1].startsWithCapitalLetter() && containsUnit(lines[i+1])) {
-                        // End of posology for current medication
-                        medications.push(currentMedication);
-                        currentMedication = null;
-                    } else {
-                        // Continue adding to posology
-                        currentMedication.posology.push(line);
-                    }
+                    currentMedication.posology.push(line);
                 }
             }
 
-            if (currentMedication) {
-                medications.push(currentMedication);
-            }
-
-            // Assign the date to each medication
-            medications.forEach(med => {
-                med.date = date;
-            });
+            if (currentMedication) medications.push(currentMedication);
 
             return medications;
         }
 
-        // Display medications in the table
         function displayMedications(medications) {
             const tableBody = document.querySelector('#medicationTable tbody');
             tableBody.innerHTML = '';
             medications.forEach(med => {
-                const posologyText = med.posology.join('<br>');
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${med.name}</td>
                     <td>${med.date}</td>
-                    <td>${posologyText}</td>
+                    <td>${med.posology.join('<br>')}</td>
                     <td><button onclick="deleteMedication(this)">Excluir</button></td>
                 `;
                 tableBody.appendChild(row);
             });
         }
 
-        // Function to reset the application
         function resetApp() {
             document.getElementById('fileInput').value = '';
             document.getElementById('loading').style.display = 'none';
             document.getElementById('preview').src = '';
-            const tableBody = document.querySelector('#medicationTable tbody');
-            tableBody.innerHTML = '';
+            document.querySelector('#medicationTable tbody').innerHTML = '';
         }
     </script>
 </body>
