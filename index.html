@@ -40,3 +40,31 @@
     </footer>
 </body>
 </html>
+<input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect(event)" accept="image/*">
+<a href="#" role="button" onclick="triggerUpload(); return false;" aria-label="Upload prescription photo" class="upload-link">Clique aqui para carregar a foto da receita</a>
+<script>
+  function triggerUpload() {
+    document.getElementById('fileInput').click();
+  }
+
+  function handleFileSelect(event) {
+    var selectedFile = event.target.files[0];
+    if (selectedFile) {
+      var fileName = selectedFile.name;
+      document.getElementById('fileNameDisplay').innerText = 'Arquivo selecionado: ' + fileName;
+    }
+  }
+</script>
+<p id="fileNameDisplay"></p>
+<style>
+  .upload-link {
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    padding: 10px 20px;
+    border-radius: 5px;
+  }
+  .upload-link:hover {
+    background-color: #0056b3;
+  }
+</style>
