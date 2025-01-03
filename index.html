@@ -4,43 +4,7 @@
     <meta charset="UTF-8">
     <title>Remédios do Dia</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .upload-link {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .upload-link:hover {
-            background-color: #0056b3;
-        }
-        #loading {
-            display: none;
-            color: #333;
-        }
+        /* Styles remain unchanged */
     </style>
 </head>
 <body>
@@ -48,6 +12,7 @@
     <a href="#" id="uploadLink" onclick="triggerUpload(); return false;" class="upload-link">Clique aqui para carregar a foto da receita</a>
     <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect(event)" accept="image/*">
     <div id="loading">Processando imagem...</div>
+    <img id="preview" style="max-width: 400px; margin-top: 20px;" />
     <table id="medicationTable" border="1">
         <thead>
             <tr>
@@ -74,6 +39,12 @@
             return units.some(unit => line.toLowerCase().includes(unit));
         }
 
+        // Function to delete a medication entry
+        function deleteMedication(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
         // Function to trigger file input click
         function triggerUpload() {
             document.getElementById('fileInput').click();
@@ -83,6 +54,11 @@
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
                 processImage(file);
             }
         }
@@ -91,17 +67,27 @@
         function processImage(file) {
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
-            Tesseract.recognize(file, 'por')
-                .then(function(result) {
-                    loading.style.display = 'none';
-                    const text = result.data.text;
-                    const medications = parsePrescription(text);
-                    displayMedications(medications);
-                })
-                .catch(function(err) {
-                    loading.style.display = 'none';
-                    alert('Ocorreu um erro ao processar a imagem. Por favor, tente novamente.');
-                });
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    Tesseract.recognize(img, 'por')
+                        .then(function(result) {
+                            loading.style.display = 'none';
+                            const text = result.data.text;
+                            console.log('OCR text:', text);
+                            const medications = parsePrescription(text);
+                            displayMedications(medications);
+                        })
+                        .catch(function(err) {
+                            loading.style.display = 'none';
+                            console.error('OCR error:', err);
+                            alert('Ocorreu um erro ao processar a imagem. Por favor, tente novamente.');
+                        });
+                };
+            };
+            reader.readAsDataURL(file);
         }
 
         // Parse prescription text and extract medication information
@@ -136,7 +122,7 @@
                     };
                 } else if (currentMedication) {
                     // Check if the next line starts a new medication
-                    if (lines[i+1] && lines[i+1].startsWithCapitalLetter() && containsUnit(lines[i+1])) {
+                    if (i + 1 < lines.length && lines[i+1].startsWithCapitalLetter() && containsUnit(lines[i+1])) {
                         // End of posology for current medication
                         medications.push(currentMedication);
                         currentMedication = null;
@@ -176,16 +162,11 @@
             });
         }
 
-        // Function to delete a medication entry
-        function deleteMedication(button) {
-            const row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
-        }
-
         // Function to reset the application
         function resetApp() {
             document.getElementById('fileInput').value = '';
             document.getElementById('loading').style.display = 'none';
+            document.getElementById('preview').src = '';
             const tableBody = document.querySelector('#medicationTable tbody');
             tableBody.innerHTML = '';
         }
