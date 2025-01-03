@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Remédios do Dia</title>
     <style>
-        /* Some basic styling */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -12,76 +11,43 @@
         h1 {
             color: #333;
         }
-        p {
-            line-height: 1.6;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .upload-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .upload-link:hover {
+            background-color: #0056b3;
+        }
+        #loading {
+            display: none;
+            color: #333;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Remédios do Dia</h1>
-        <nav>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Sobre</a></li>
-                <li><a href="#">Contato</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section>
-            <h2>Bem-vindo ao Remédios do Dia</h2>
-            <p>Gerencie suas medicações diariamente de forma fácil e eficaz.</p>
-            <p>Este é um aplicativo web para ajudar você a manter o controle de seus remédios.</p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 Remédios do Dia. Todos os direitos reservados.</p>
-    </footer>
-</body>
-</html>
-<input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect(event)" accept="image/*">
-<a href="#" role="button" onclick="triggerUpload(); return false;" aria-label="Upload prescription photo" class="upload-link">Clique aqui para carregar a foto da receita</a>
-<script>
-  function triggerUpload() {
-    document.getElementById('fileInput').click();
-  }
-
-  function handleFileSelect(event) {
-    var selectedFile = event.target.files[0];
-    if (selectedFile) {
-      var fileName = selectedFile.name;
-      document.getElementById('fileNameDisplay').innerText = 'Arquivo selecionado: ' + fileName;
-    }
-  }
-</script>
-<p id="fileNameDisplay"></p>
-<style>
-  .upload-link {
-    text-decoration: none;
-    color: white;
-    background-color: #007bff;
-    padding: 10px 20px;
-    border-radius: 5px;
-  }
-  .upload-link:hover {
-    background-color: #0056b3;
-  }
-</style>
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Remédios do Dia</title>
-    <style>
-        /* Add styling for the table and buttons */
-    </style>
-</head>
-<body>
     <h1>Remédios do Dia</h1>
-    <a href="#" id="uploadLink" onclick="triggerUpload(); return false;">Clique aqui para carregar a foto da receita</a>
+    <a href="#" id="uploadLink" onclick="triggerUpload(); return false;" class="upload-link">Clique aqui para carregar a foto da receita</a>
     <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect(event)" accept="image/*">
-    <div id="loading" style="display:none;">Processando imagem...</div>
+    <div id="loading">Processando imagem...</div>
     <table id="medicationTable" border="1">
         <thead>
             <tr>
@@ -96,60 +62,68 @@
         </tbody>
     </table>
     <script src="https://unpkg.com/tesseract.js@2.1.3/dist/tesseract.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Function to trigger file input click
+        function triggerUpload() {
+            document.getElementById('fileInput').click();
+        }
+
+        // Handle file selection
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processImage(file);
+            }
+        }
+
+        // Process the uploaded image with OCR
+        function processImage(file) {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            Tesseract.recognize(file, 'por')
+                .then(function(result) {
+                    loading.style.display = 'none';
+                    const text = result.data.text;
+                    parsePrescription(text);
+                })
+                .catch(function(err) {
+                    loading.style.display = 'none';
+                    alert('Ocorreu um erro ao processar a imagem. Por favor, tente novamente.');
+                });
+        }
+
+        // Parse prescription text and extract medication information
+        function parsePrescription(text) {
+            // Placeholder for actual parsing logic
+            // For demonstration, use sample data
+            const medications = [
+                { name: 'Paracetamol', date: '2023-10-01', posology: '2x ao dia' },
+                { name: 'Ibuprofeno', date: '2023-10-01', posology: '1x ao dia' }
+            ];
+            displayMedications(medications);
+        }
+
+        // Display medications in the table
+        function displayMedications(medications) {
+            const tableBody = document.querySelector('#medicationTable tbody');
+            tableBody.innerHTML = '';
+            medications.forEach(med => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${med.name}</td>
+                    <td>${med.date}</td>
+                    <td>${med.posology}</td>
+                    <td><button onclick="deleteMedication(this)">Excluir</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to delete a medication entry
+        function deleteMedication(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+    </script>
 </body>
 </html>
-// script.js
-
-function triggerUpload() {
-    document.getElementById('fileInput').click();
-}
-
-function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-        processImage(file);
-    }
-}
-
-function processImage(file) {
-    const loading = document.getElementById('loading');
-    loading.style.display = 'block';
-    Tesseract.recognize(file, 'por')
-        .then(function(result) {
-            loading.style.display = 'none';
-            const text = result.data.text;
-            parsePrescription(text);
-        })
-        .catch(function(err) {
-            loading.style.display = 'none';
-            alert('Ocorreu um erro ao processar a imagem. Por favor, tente novamente.');
-        });
-}
-function parsePrescription(text) {
-    // Implement parsing logic based on expected prescription format
-    // For demonstration, assume a simple format:
-    const medications = [
-        { name: 'Paracetamol', date: '2023-10-01', posology: '2x ao dia' },
-        { name: 'Ibuprofeno', date: '2023-10-01', posology: '1x ao dia' }
-    ];
-    displayMedications(medications);
-}
-function displayMedications(medications) {
-    const tableBody = document.querySelector('#medicationTable tbody');
-    tableBody.innerHTML = '';
-    medications.forEach(med => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${med.name}</td>
-            <td>${med.date}</td>
-            <td>${med.posology}</td>
-            <td><button onclick="deleteMedication(this)">Excluir</button></td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-function deleteMedication(button) {
-    const row = button.parentNode.parentNode;
-    row.parentNode.removeChild(row);
-}
