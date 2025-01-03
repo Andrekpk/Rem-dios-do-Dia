@@ -2,16 +2,20 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Remédios do Dia</title>
+    <title>Lista de Medicamentos</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        #loading {
-            display: none;
-            font-size: 16px;
-            color: #007bff;
+        #imageContainer {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            max-width: 400px;
+        }
+        #preview {
+            max-width: 100%;
         }
         table {
             margin-top: 20px;
@@ -25,16 +29,26 @@
             padding: 10px;
             text-align: left;
         }
-        .upload-link {
-            text-decoration: underline;
-            cursor: pointer;
-            color: #007bff;
+        .autocomplete {
+            position: relative;
         }
-        .upload-link:hover {
-            color: #0056b3;
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #ccc;
+            background: #fff;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            width: 100%;
+        }
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .autocomplete-items div:hover {
+            background: #f0f0f0;
         }
         button {
-            margin-top: 20px;
             padding: 10px 15px;
             background-color: #007bff;
             color: white;
@@ -48,43 +62,119 @@
     </style>
 </head>
 <body>
-    <h1>Remédios do Dia</h1>
-    <a href="#" id="uploadLink" onclick="triggerUpload(); return false;" class="upload-link">Clique aqui para carregar a foto da receita</a>
-    <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect(event)" accept="image/*">
-    <div id="loading">Processando imagem, por favor aguarde...</div>
-    <img id="preview" style="max-width: 400px; margin-top: 20px;" />
+    <h1>Lista de Medicamentos</h1>
+    <div id="imageContainer">
+        <label for="dateInput">Data da Receita:</label>
+        <input type="date" id="dateInput">
+        <br><br>
+        <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+        <img id="preview" />
+    </div>
+    
+    <h2>Adicionar Medicamento</h2>
+    <form id="medicationForm" onsubmit="addMedication(event)">
+        <div class="autocomplete">
+            <label for="medicationName">Nome do Medicamento:</label>
+            <input type="text" id="medicationName" placeholder="Digite o nome do medicamento">
+        </div>
+        <label for="medicationDosage">Posologia:</label>
+        <input type="text" id="medicationDosage" placeholder="Digite a posologia">
+        <br><br>
+        <button type="submit">Adicionar</button>
+    </form>
+    
+    <h2>Lista de Medicamentos</h2>
     <table id="medicationTable">
         <thead>
             <tr>
-                <th>Medicação</th>
-                <th>Data de Inserção</th>
+                <th>Nome</th>
                 <th>Posologia</th>
+                <th>Data</th>
                 <th>Ação</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Medications will be listed here -->
+            <!-- Lista de medicamentos -->
         </tbody>
     </table>
-    <button onclick="resetApp()">Limpar Lista</button>
-    <script src="https://unpkg.com/tesseract.js@2.1.3/dist/tesseract.min.js"></script>
+    
     <script>
-        String.prototype.startsWithCapitalLetter = function() {
-            return this.charAt(0).toUpperCase() === this.charAt(0) && /[A-ZÁÉÍÓÚÀÈÌÒÙÇ]/.test(this.charAt(0));
-        };
+        const commonMedications = [
+            "Dipirona",
+            "Paracetamol",
+            "Ibuprofeno",
+            "Amoxicilina",
+            "Omeprazol",
+            "Losartana",
+            "Metformina",
+            "Simvastatina",
+            "Prednisona",
+            "Clonazepam"
+        ];
 
-        function containsUnit(line) {
-            const units = ['mg', 'mcg', 'ml', 'comprimido', 'tablete', 'cápsula', 'sachê', 'injeção'];
-            return units.some(unit => line.toLowerCase().includes(unit));
-        }
+        // Função para mostrar autocomplete
+        function setupAutocomplete(input, options) {
+            let currentFocus;
 
-        function deleteMedication(button) {
-            const row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
-        }
+            input.addEventListener("input", function() {
+                const val = this.value;
+                closeAllLists();
+                if (!val) return false;
 
-        function triggerUpload() {
-            document.getElementById('fileInput').click();
+                currentFocus = -1;
+
+                const list = document.createElement("div");
+                list.setAttribute("class", "autocomplete-items");
+                this.parentNode.appendChild(list);
+
+                options.forEach(option => {
+                    if (option.toLowerCase().startsWith(val.toLowerCase())) {
+                        const item = document.createElement("div");
+                        item.innerHTML = `<strong>${option.substr(0, val.length)}</strong>${option.substr(val.length)}`;
+                        item.addEventListener("click", function() {
+                            input.value = option;
+                            closeAllLists();
+                        });
+                        list.appendChild(item);
+                    }
+                });
+            });
+
+            input.addEventListener("keydown", function(e) {
+                const items = document.querySelectorAll(".autocomplete-items div");
+                if (e.keyCode === 40) {
+                    currentFocus++;
+                    addActive(items);
+                } else if (e.keyCode === 38) {
+                    currentFocus--;
+                    addActive(items);
+                } else if (e.keyCode === 13) {
+                    e.preventDefault();
+                    if (currentFocus > -1) {
+                        items[currentFocus].click();
+                    }
+                }
+            });
+
+            function addActive(items) {
+                if (!items) return false;
+                removeActive(items);
+                if (currentFocus >= items.length) currentFocus = 0;
+                if (currentFocus < 0) currentFocus = items.length - 1;
+                items[currentFocus].classList.add("autocomplete-active");
+            }
+
+            function removeActive(items) {
+                items.forEach(item => item.classList.remove("autocomplete-active"));
+            }
+
+            function closeAllLists() {
+                document.querySelectorAll(".autocomplete-items").forEach(item => item.remove());
+            }
+
+            document.addEventListener("click", function(e) {
+                if (e.target !== input) closeAllLists();
+            });
         }
 
         function handleFileSelect(event) {
@@ -95,85 +185,40 @@
                     document.getElementById('preview').src = e.target.result;
                 };
                 reader.readAsDataURL(file);
-                processImage(file);
             }
         }
 
-        function processImage(file) {
-            const loading = document.getElementById('loading');
-            loading.style.display = 'block';
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    Tesseract.recognize(img, 'por')
-                        .then(result => {
-                            loading.style.display = 'none';
-                            const text = result.data.text;
-                            const medications = parsePrescription(text);
-                            displayMedications(medications);
-                        })
-                        .catch(err => {
-                            loading.style.display = 'none';
-                            console.error('Erro no OCR:', err);
-                            alert('Erro ao processar a imagem. Verifique a qualidade da foto.');
-                        });
-                };
-            };
-            reader.readAsDataURL(file);
-        }
+        function addMedication(event) {
+            event.preventDefault();
 
-        function parsePrescription(text) {
-            const lines = text.split('\n').map(line => line.trim());
-            const medications = [];
-            const datePattern = /\b\d{2}\/\d{2}\/\d{4}\b/;
-            let currentMedication = null;
+            const name = document.getElementById("medicationName").value.trim();
+            const dosage = document.getElementById("medicationDosage").value.trim();
+            const date = document.getElementById("dateInput").value || "Não informado";
 
-            let date = lines.find(line => datePattern.test(line))?.match(datePattern)?.[0] || 'Não informada';
-
-            for (const line of lines) {
-                if (!line) continue;
-
-                if (line.startsWithCapitalLetter() && containsUnit(line)) {
-                    if (currentMedication) medications.push(currentMedication);
-
-                    currentMedication = {
-                        name: line,
-                        posology: [],
-                        date
-                    };
-                } else if (currentMedication) {
-                    currentMedication.posology.push(line);
-                }
+            if (!name || !dosage) {
+                alert("Por favor, preencha todos os campos.");
+                return;
             }
 
-            if (currentMedication) medications.push(currentMedication);
+            const tableBody = document.querySelector("#medicationTable tbody");
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${name}</td>
+                <td>${dosage}</td>
+                <td>${date}</td>
+                <td><button onclick="deleteMedication(this)">Excluir</button></td>
+            `;
+            tableBody.appendChild(row);
 
-            return medications;
+            document.getElementById("medicationForm").reset();
         }
 
-        function displayMedications(medications) {
-            const tableBody = document.querySelector('#medicationTable tbody');
-            tableBody.innerHTML = '';
-            medications.forEach(med => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${med.name}</td>
-                    <td>${med.date}</td>
-                    <td>${med.posology.join('<br>')}</td>
-                    <td><button onclick="deleteMedication(this)">Excluir</button></td>
-                `;
-                tableBody.appendChild(row);
-            });
+        function deleteMedication(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
         }
 
-        function resetApp() {
-            document.getElementById('fileInput').value = '';
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('preview').src = '';
-            document.querySelector('#medicationTable tbody').innerHTML = '';
-        }
+        setupAutocomplete(document.getElementById("medicationName"), commonMedications);
     </script>
 </body>
 </html>
