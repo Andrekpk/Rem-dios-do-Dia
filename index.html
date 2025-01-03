@@ -2,20 +2,30 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Lista de Medicamentos</title>
+    <title>Gerenciador de Receitas</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        #imageContainer {
+        .image-container {
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 20px;
             max-width: 400px;
         }
-        #preview {
+        .image-container img {
             max-width: 100%;
+            display: block;
+            margin: 10px 0;
+        }
+        .image-container label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .medication-form {
+            margin-top: 20px;
         }
         table {
             margin-top: 20px;
@@ -28,25 +38,6 @@
         th, td {
             padding: 10px;
             text-align: left;
-        }
-        .autocomplete {
-            position: relative;
-        }
-        .autocomplete-items {
-            position: absolute;
-            border: 1px solid #ccc;
-            background: #fff;
-            max-height: 150px;
-            overflow-y: auto;
-            z-index: 1000;
-            width: 100%;
-        }
-        .autocomplete-items div {
-            padding: 10px;
-            cursor: pointer;
-        }
-        .autocomplete-items div:hover {
-            background: #f0f0f0;
         }
         button {
             padding: 10px 15px;
@@ -62,21 +53,22 @@
     </style>
 </head>
 <body>
-    <h1>Lista de Medicamentos</h1>
-    <div id="imageContainer">
-        <label for="dateInput">Data da Receita:</label>
-        <input type="date" id="dateInput">
-        <br><br>
-        <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
-        <img id="preview" />
-    </div>
+    <h1>Gerenciador de Receitas</h1>
     
-    <h2>Adicionar Medicamento</h2>
-    <form id="medicationForm" onsubmit="addMedication(event)">
-        <div class="autocomplete">
-            <label for="medicationName">Nome do Medicamento:</label>
-            <input type="text" id="medicationName" placeholder="Digite o nome do medicamento">
+    <div id="uploadSection">
+        <!-- Campo inicial de upload de imagens -->
+        <div class="image-container">
+            <label for="date-0">Data da Receita:</label>
+            <input type="date" id="date-0">
+            <input type="file" id="file-0" accept="image/*" onchange="handleFileSelect(this, 0)">
+            <img id="preview-0" />
         </div>
+    </div>
+
+    <h2>Adicionar Medicamento</h2>
+    <form id="medicationForm" class="medication-form" onsubmit="addMedication(event)">
+        <label for="medicationName">Nome do Medicamento:</label>
+        <input type="text" id="medicationName" placeholder="Digite o nome do medicamento">
         <label for="medicationDosage">Posologia:</label>
         <input type="text" id="medicationDosage" placeholder="Digite a posologia">
         <br><br>
@@ -89,7 +81,6 @@
             <tr>
                 <th>Nome</th>
                 <th>Posologia</th>
-                <th>Data</th>
                 <th>Ação</th>
             </tr>
         </thead>
@@ -97,95 +88,58 @@
             <!-- Lista de medicamentos -->
         </tbody>
     </table>
-    
+
     <script>
-        const commonMedications = [
-            "Dipirona",
-            "Paracetamol",
-            "Ibuprofeno",
-            "Amoxicilina",
-            "Omeprazol",
-            "Losartana",
-            "Metformina",
-            "Simvastatina",
-            "Prednisona",
-            "Clonazepam"
-        ];
+        let imageCount = 1; // Contador para campos de upload de imagem
 
-        // Função para mostrar autocomplete
-        function setupAutocomplete(input, options) {
-            let currentFocus;
-
-            input.addEventListener("input", function() {
-                const val = this.value;
-                closeAllLists();
-                if (!val) return false;
-
-                currentFocus = -1;
-
-                const list = document.createElement("div");
-                list.setAttribute("class", "autocomplete-items");
-                this.parentNode.appendChild(list);
-
-                options.forEach(option => {
-                    if (option.toLowerCase().startsWith(val.toLowerCase())) {
-                        const item = document.createElement("div");
-                        item.innerHTML = `<strong>${option.substr(0, val.length)}</strong>${option.substr(val.length)}`;
-                        item.addEventListener("click", function() {
-                            input.value = option;
-                            closeAllLists();
-                        });
-                        list.appendChild(item);
-                    }
-                });
-            });
-
-            input.addEventListener("keydown", function(e) {
-                const items = document.querySelectorAll(".autocomplete-items div");
-                if (e.keyCode === 40) {
-                    currentFocus++;
-                    addActive(items);
-                } else if (e.keyCode === 38) {
-                    currentFocus--;
-                    addActive(items);
-                } else if (e.keyCode === 13) {
-                    e.preventDefault();
-                    if (currentFocus > -1) {
-                        items[currentFocus].click();
-                    }
-                }
-            });
-
-            function addActive(items) {
-                if (!items) return false;
-                removeActive(items);
-                if (currentFocus >= items.length) currentFocus = 0;
-                if (currentFocus < 0) currentFocus = items.length - 1;
-                items[currentFocus].classList.add("autocomplete-active");
-            }
-
-            function removeActive(items) {
-                items.forEach(item => item.classList.remove("autocomplete-active"));
-            }
-
-            function closeAllLists() {
-                document.querySelectorAll(".autocomplete-items").forEach(item => item.remove());
-            }
-
-            document.addEventListener("click", function(e) {
-                if (e.target !== input) closeAllLists();
-            });
-        }
-
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
+        function handleFileSelect(input, index) {
+            const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById(`preview-${index}`).src = e.target.result;
                 };
                 reader.readAsDataURL(file);
+
+                // Cria um novo espaço de upload após o upload atual
+                addNewUploadField();
             }
+        }
+
+        function addNewUploadField() {
+            const uploadSection = document.getElementById("uploadSection");
+
+            const container = document.createElement("div");
+            container.classList.add("image-container");
+
+            const dateLabel = document.createElement("label");
+            dateLabel.textContent = "Data da Receita:";
+            dateLabel.setAttribute("for", `date-${imageCount}`);
+
+            const dateInput = document.createElement("input");
+            dateInput.type = "date";
+            dateInput.id = `date-${imageCount}`;
+
+            const fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.id = `file-${imageCount}`;
+            fileInput.accept = "image/*";
+            fileInput.setAttribute("onchange", `handleFileSelect(this, ${imageCount})`);
+
+            const preview = document.createElement("img");
+            preview.id = `preview-${imageCount}`;
+
+            // Adiciona os elementos ao container
+            container.appendChild(dateLabel);
+            container.appendChild(dateInput);
+            container.appendChild(fileInput);
+            container.appendChild(preview);
+
+            // Adiciona o container ao uploadSection
+            uploadSection.appendChild(container);
+
+            // Incrementa o contador de imagens
+            imageCount++;
         }
 
         function addMedication(event) {
@@ -193,7 +147,6 @@
 
             const name = document.getElementById("medicationName").value.trim();
             const dosage = document.getElementById("medicationDosage").value.trim();
-            const date = document.getElementById("dateInput").value || "Não informado";
 
             if (!name || !dosage) {
                 alert("Por favor, preencha todos os campos.");
@@ -205,7 +158,6 @@
             row.innerHTML = `
                 <td>${name}</td>
                 <td>${dosage}</td>
-                <td>${date}</td>
                 <td><button onclick="deleteMedication(this)">Excluir</button></td>
             `;
             tableBody.appendChild(row);
@@ -217,8 +169,6 @@
             const row = button.parentNode.parentNode;
             row.parentNode.removeChild(row);
         }
-
-        setupAutocomplete(document.getElementById("medicationName"), commonMedications);
     </script>
 </body>
 </html>
