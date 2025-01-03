@@ -91,39 +91,97 @@
                     alert('Ocorreu um erro ao processar a imagem. Por favor, tente novamente.');
                 });
         }
+function parsePrescription(text) {
+    const lines = text.split('\n');
+    let date = '';
+    let medications = [];
+    let currentMedication = null;
+    const datePattern = /\b\d{2}\/\d{2}\/\d{4}\b/;
 
-        // Parse prescription text and extract medication information
-        function parsePrescription(text) {
-            // Placeholder for actual parsing logic
-            // For demonstration, use sample data
-            const medications = [
-                { name: 'Paracetamol', date: '2023-10-01', posology: '2x ao dia' },
-                { name: 'Ibuprofeno', date: '2023-10-01', posology: '1x ao dia' }
-            ];
-            displayMedications(medications);
+    // Find the date in the first few lines
+    for (let i = 0; i < 5; i++) {
+        if (lines[i] && datePattern.test(lines[i])) {
+            date = lines[i].match(datePattern)[0];
+            break;
         }
+    }
 
+    // Iterate through lines to find medication entries
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // Check if the line contains a medication name
+        if (line.startsWithCapitalLetter() && containsUnit(line)) {
+            if (currentMedication) {
+                medications.push(currentMedication);
+            }
+            currentMedication = {
+                name: line,
+                posology: []
+            };
+        } else if (currentMedication) {
+            // Add posology lines until a new medication is found
+            if (lines[i+1] && lines[i+1].startsWithCapitalLetter() && containsUnit(lines[i+1])) {
+                // End of posology for current medication
+                medications.push(currentMedication);
+                currentMedication = null;
+            } else {
+                // Continue adding to posology
+                currentMedication.posology.push(line);
+            }
+        }
+    }
+
+    if (currentMedication) {
+        medications.push(currentMedication);
+    }
+
+    // Assign the date to each medication
+    medications.forEach(med => {
+        med.date = date;
+    });
+
+    return medications;
+}
         // Display medications in the table
         function displayMedications(medications) {
-            const tableBody = document.querySelector('#medicationTable tbody');
-            tableBody.innerHTML = '';
-            medications.forEach(med => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${med.name}</td>
-                    <td>${med.date}</td>
-                    <td>${med.posology}</td>
-                    <td><button onclick="deleteMedication(this)">Excluir</button></td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
+    const tableBody = document.querySelector('#medicationTable tbody');
+    tableBody.innerHTML = '';
+    medications.forEach(med => {
+        const posologyText = med.posology.join(' ');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${med.name}</td>
+            <td>${med.date}</td>
+            <td>${posologyText}</td>
+            <td><button onclick="deleteMedication(this)">Excluir</button></td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
         // Function to delete a medication entry
         function deleteMedication(button) {
             const row = button.parentNode.parentNode;
             row.parentNode.removeChild(row);
         }
     </script>
+const datePattern = /\b\d{2}\/\d{2}\/\d{4}\b/;
+let date = '';
+for (let i = 0; i < 5; i++) {
+    if (lines[i] && datePattern.test(lines[i])) {
+        date = lines[i].match(datePattern)[0];
+        break;
+    }
+}
+  String.prototype.startsWithCapitalLetter = function() {
+    return this.charAt(0) === this.charAt(0).toUpperCase() && this.charAt(0).match(/[A-Z]/i);
+};
+
+function containsUnit(line) {
+    const units = ['mg', 'mcg', 'ml', 'comprimido', 'tablete', 'cápsula', 'sachê', 'injeção'];
+    return units.some(unit => line.toLowerCase().includes(unit));
+}
+    
 </body>
 </html>
