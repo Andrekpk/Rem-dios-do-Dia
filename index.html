@@ -33,6 +33,23 @@
             margin-bottom: 10px;
             display: block;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        input.table-input {
+            width: 90%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
         button {
             padding: 10px 15px;
             background-color: #007bff;
@@ -55,13 +72,30 @@
     </div>
 
     <div id="uploadSection">
-        <!-- Campo inicial de upload de imagens -->
         <div class="image-container">
             <span class="date-label" id="dateLabel-0"></span>
             <input type="file" id="file-0" accept="image/*" onchange="handleFileSelect(this, 0)">
             <img id="preview-0" />
         </div>
     </div>
+
+    <h2>Tabela de Medicamentos</h2>
+    <table id="medicationTable">
+        <thead>
+            <tr>
+                <th>Nome do Remédio</th>
+                <th>Dosagem (mg)</th>
+                <th>Como Tomar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" class="table-input" onfocus="addNewRow(this)" /></td>
+                <td><input type="text" class="table-input" onfocus="addNewRow(this)" /></td>
+                <td><input type="text" class="table-input" onfocus="addNewRow(this)" /></td>
+            </tr>
+        </tbody>
+    </table>
 
     <script>
         let imageCount = 1; // Contador para campos de upload de imagem
@@ -126,25 +160,4 @@
             dateLabel.id = `dateLabel-${imageCount}`;
 
             const fileInput = document.createElement("input");
-            fileInput.type = "file";
-            fileInput.id = `file-${imageCount}`;
-            fileInput.accept = "image/*";
-            fileInput.setAttribute("onchange", `handleFileSelect(this, ${imageCount})`);
-
-            const preview = document.createElement("img");
-            preview.id = `preview-${imageCount}`;
-
-            // Adiciona os elementos ao container
-            container.appendChild(dateLabel);
-            container.appendChild(fileInput);
-            container.appendChild(preview);
-
-            // Adiciona o container ao uploadSection
-            uploadSection.appendChild(container);
-
-            // Incrementa o contador de imagens
-            imageCount++;
-        }
-    </script>
-</body>
-</html>
+            file
