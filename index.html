@@ -28,7 +28,17 @@
             color: #0056b3;
         }
 
-        /* Ajuste aqui: Removemos max-width e margin auto para ocupar toda a largura */
+        /* Container do logotipo no topo */
+        .logo-top {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        /* Container do logotipo no rodapé */
+        .logo-bottom {
+            text-align: center;
+            margin-top: 20px;
+        }
+
         .image-container {
             border: 1px solid #ccc;
             padding: 10px;
@@ -37,7 +47,6 @@
             box-sizing: border-box;
             text-align: center;
         }
-        /* Ajuste aqui: definimos width: 100% para a imagem preencher toda a tela */
         .image-container img {
             width: 100%;
             height: auto;
@@ -76,6 +85,13 @@
     </style>
 </head>
 <body>
+
+    <!-- LOGO SUPERIOR -->
+    <div class="logo-top">
+        <!-- Ajuste a altura para o valor que achar melhor -->
+        <img src="Design sem nome.png" alt="Logo Topo" style="max-height: 150px;">
+    </div>
+
     <div class="title-container">
         <h1 id="pageTitle">Remédio de <span id="userName">_______</span></h1>
         <input type="text" id="nameInput" placeholder="Digite o nome">
@@ -91,7 +107,8 @@
         </div>
     </div>
 
-    <h2>Tabela de Medicamentos</h2>
+    <h2>Remédios que não estão receitas acima</h2>
+
     <table id="medicationTable">
         <thead>
             <tr>
@@ -107,6 +124,12 @@
     <button onclick="addRow()">Adicionar</button>
     <button onclick="deleteSelected()">Excluir</button>
 
+    <!-- LOGO INFERIOR -->
+    <div class="logo-bottom">
+        <!-- Ajuste a altura para o valor que achar melhor -->
+        <img src="Logo.png" alt="Logo Rodapé" style="max-height: 150px;">
+    </div>
+
     <script>
         // Define o nome do usuário e altera o layout
         function setName() {
@@ -117,8 +140,8 @@
 
             if (nameInput.value.trim() !== "") {
                 userName.textContent = nameInput.value; // Atualiza o título
-                nameInput.style.display = "none"; // Esconde o campo de texto
-                okButton.style.display = "none"; // Esconde o botão OK
+                nameInput.style.display = "none";        // Esconde o campo de texto
+                okButton.style.display = "none";         // Esconde o botão OK
                 changeNameButton.style.display = "inline-block"; // Mostra o botão de trocar nome
             } else {
                 alert("Por favor, insira um nome válido.");
@@ -132,8 +155,8 @@
             const changeNameButton = document.getElementById("changeNameButton");
 
             nameInput.style.display = "inline-block"; // Mostra o campo de texto
-            okButton.style.display = "inline-block"; // Mostra o botão OK
-            changeNameButton.style.display = "none"; // Esconde o botão de trocar nome
+            okButton.style.display = "inline-block";  // Mostra o botão OK
+            changeNameButton.style.display = "none";   // Esconde o botão de trocar nome
         }
 
         // Lida com o upload da imagem
