@@ -86,16 +86,15 @@
                 <th>Nome do Remédio</th>
                 <th>Dosagem (mg)</th>
                 <th>Como Tomar</th>
+                <th>Ação</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td><input type="text" class="table-input" onfocus="addNewRow(this)" /></td>
-                <td><input type="text" class="table-input" onfocus="addNewRow(this)" /></td>
-                <td><input type="text" class="table-input" onfocus="addNewRow(this)" /></td>
-            </tr>
+            <!-- Linhas adicionadas dinamicamente -->
         </tbody>
     </table>
+    <button onclick="addRow()">Adicionar</button>
+    <button onclick="deleteSelected()">Excluir</button>
 
     <script>
         let imageCount = 1; // Contador para campos de upload de imagem
@@ -160,4 +159,49 @@
             dateLabel.id = `dateLabel-${imageCount}`;
 
             const fileInput = document.createElement("input");
-            file
+            fileInput.type = "file";
+            fileInput.id = `file-${imageCount}`;
+            fileInput.accept = "image/*";
+            fileInput.onchange = function () {
+                handleFileSelect(this, imageCount);
+            };
+
+            const imgPreview = document.createElement("img");
+            imgPreview.id = `preview-${imageCount}`;
+
+            container.appendChild(dateLabel);
+            container.appendChild(fileInput);
+            container.appendChild(imgPreview);
+            uploadSection.appendChild(container);
+
+            imageCount++;
+        }
+
+        // Função para adicionar uma nova linha na tabela
+        function addRow() {
+            const table = document.getElementById("medicationTable").getElementsByTagName("tbody")[0];
+            const newRow = table.insertRow();
+
+            newRow.innerHTML = `
+                <td><input type="text" class="table-input" placeholder="Nome do remédio"></td>
+                <td><input type="text" class="table-input" placeholder="Dosagem (mg)"></td>
+                <td><input type="text" class="table-input" placeholder="Como tomar"></td>
+                <td><input type="checkbox"></td>
+            `;
+        }
+
+        // Função para excluir linhas selecionadas
+        function deleteSelected() {
+            const table = document.getElementById("medicationTable").getElementsByTagName("tbody")[0];
+            const rows = table.rows;
+
+            for (let i = rows.length - 1; i >= 0; i--) {
+                const checkbox = rows[i].cells[3].getElementsByTagName("input")[0];
+                if (checkbox.checked) {
+                    table.deleteRow(i);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
