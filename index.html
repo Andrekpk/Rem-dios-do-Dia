@@ -27,19 +27,24 @@
         .title-container button:hover {
             color: #0056b3;
         }
+
+        /* Ajuste aqui: Removemos max-width e margin auto para ocupar toda a largura */
         .image-container {
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 20px;
-            max-width: 400px;
-            margin: auto;
+            width: 100%; 
+            box-sizing: border-box;
             text-align: center;
         }
+        /* Ajuste aqui: definimos width: 100% para a imagem preencher toda a tela */
         .image-container img {
-            max-width: 100%;
+            width: 100%;
+            height: auto;
             display: block;
             margin: 10px auto;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -129,6 +134,55 @@
             nameInput.style.display = "inline-block"; // Mostra o campo de texto
             okButton.style.display = "inline-block"; // Mostra o botão OK
             changeNameButton.style.display = "none"; // Esconde o botão de trocar nome
+        }
+
+        // Lida com o upload da imagem
+        function handleFileSelect(input, index) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(`preview-${index}`).src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                // Atualiza a data com a data do upload
+                const dateLabel = document.getElementById(`dateLabel-${index}`);
+                const today = new Date();
+                dateLabel.textContent = `Dia... ${today.toLocaleDateString('pt-BR')}`;
+
+                // Cria um novo espaço de upload para a próxima imagem
+                addNewUploadField();
+            }
+        }
+
+        // Adiciona um novo espaço para upload
+        function addNewUploadField() {
+            const uploadSection = document.getElementById("uploadSection");
+            let index = uploadSection.querySelectorAll(".image-container").length;
+
+            const container = document.createElement("div");
+            container.classList.add("image-container");
+
+            const dateLabel = document.createElement("span");
+            dateLabel.classList.add("date-label");
+            dateLabel.id = `dateLabel-${index}`;
+
+            const fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.id = `file-${index}`;
+            fileInput.accept = "image/*";
+            fileInput.onchange = function () {
+                handleFileSelect(this, index);
+            };
+
+            const imgPreview = document.createElement("img");
+            imgPreview.id = `preview-${index}`;
+
+            container.appendChild(dateLabel);
+            container.appendChild(fileInput);
+            container.appendChild(imgPreview);
+            uploadSection.appendChild(container);
         }
 
         // Função para adicionar uma nova linha na tabela
