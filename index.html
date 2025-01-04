@@ -141,7 +141,8 @@
     </div>
 
     <div id="uploadSection">
-        <div class="image-container">
+        <!-- Primeiro container (index 0) -->
+        <div class="image-container" id="image-container-0">
             <span class="date-label" id="dateLabel-0"></span>
 
             <!-- ENVOLTÓRIO para esconder input file e mostrar botão custom -->
@@ -233,21 +234,17 @@
                 const today = new Date();
                 dateLabel.textContent = `Dia... ${today.toLocaleDateString('pt-BR')}`;
 
-                // Cria um novo espaço de upload para a próxima imagem (se quiser continuar)
+                // Cria um novo espaço de upload para a próxima imagem
                 addNewUploadField();
             }
         }
 
-        // Exclui a imagem carregada (reseta input e preview)
+        // Remove todo o container (toda a célula) ao clicar em "Excluir Imagem"
         function deleteImage(index) {
-            // Limpa o src da imagem
-            document.getElementById(`preview-${index}`).src = "";
-            // Reseta o valor do input file
-            document.getElementById(`file-${index}`).value = "";
-            // Esconde o botão Excluir
-            document.getElementById(`deleteButton-${index}`).style.display = "none";
-            // Opcional: pode também limpar a data
-            document.getElementById(`dateLabel-${index}`).textContent = "";
+            const container = document.getElementById(`image-container-${index}`);
+            if (container) {
+                container.remove(); 
+            }
         }
 
         // Adiciona um novo espaço para upload
@@ -255,8 +252,10 @@
             const uploadSection = document.getElementById("uploadSection");
             let index = uploadSection.querySelectorAll(".image-container").length;
 
+            // Cria a div principal e atribui um ID único
             const container = document.createElement("div");
             container.classList.add("image-container");
+            container.id = `image-container-${index}`;
 
             const dateLabel = document.createElement("span");
             dateLabel.classList.add("date-label");
@@ -297,10 +296,13 @@
                 deleteImage(index);
             };
 
+            // Monta tudo dentro do container
             container.appendChild(dateLabel);
             container.appendChild(fileWrapper);
             container.appendChild(imgPreview);
             container.appendChild(deleteBtn);
+
+            // Adiciona no uploadSection
             uploadSection.appendChild(container);
         }
 
