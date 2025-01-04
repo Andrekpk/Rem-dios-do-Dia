@@ -82,6 +82,47 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        /* --- Novo estilo para esconder o input file e criar um botão customizado --- */
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        /* Esconde o input de arquivo real */
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        /* Botão customizado para chamar o input file */
+        .custom-file-button {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+            border: 1px solid #007bff;
+        }
+        .custom-file-button:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        /* Botão excluir imagem */
+        .delete-image-button {
+            display: none; /* Começa invisível até que a imagem seja carregada */
+            margin-top: 10px;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .delete-image-button:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
     </style>
 </head>
 <body>
@@ -89,7 +130,7 @@
     <!-- LOGO SUPERIOR -->
     <div class="logo-top">
         <!-- Ajuste a altura para o valor que achar melhor -->
-        <img src="Design sem nome.png.jpeg" alt="Logo Topo" style="max-height: 150px;">
+        <img src="Design sem nome.png" alt="Logo Topo" style="max-height: 150px;">
     </div>
 
     <div class="title-container">
@@ -102,8 +143,19 @@
     <div id="uploadSection">
         <div class="image-container">
             <span class="date-label" id="dateLabel-0"></span>
-            <input type="file" id="file-0" accept="image/*" onchange="handleFileSelect(this, 0)">
+
+            <!-- ENVOLTÓRIO para esconder input file e mostrar botão custom -->
+            <div class="file-input-wrapper">
+                <input type="file" id="file-0" accept="image/*" onchange="handleFileSelect(this, 0)">
+                <button class="custom-file-button" type="button" onclick="triggerFileSelect(0)">
+                    Carregar Imagem
+                </button>
+            </div>
+
             <img id="preview-0" />
+            <button class="delete-image-button" id="deleteButton-0" onclick="deleteImage(0)">
+                Excluir Imagem
+            </button>
         </div>
     </div>
 
@@ -126,7 +178,6 @@
 
     <!-- LOGO INFERIOR -->
     <div class="logo-bottom">
-        <!-- Ajuste a altura para o valor que achar melhor -->
         <img src="Logo.png" alt="Logo Rodapé" style="max-height: 150px;">
     </div>
 
@@ -159,6 +210,11 @@
             changeNameButton.style.display = "none";   // Esconde o botão de trocar nome
         }
 
+        // Dispara o clique do input file escondido
+        function triggerFileSelect(index) {
+            document.getElementById(`file-${index}`).click();
+        }
+
         // Lida com o upload da imagem
         function handleFileSelect(input, index) {
             const file = input.files[0];
@@ -169,14 +225,29 @@
                 };
                 reader.readAsDataURL(file);
 
+                // Mostra o botão excluir
+                document.getElementById(`deleteButton-${index}`).style.display = "inline-block";
+
                 // Atualiza a data com a data do upload
                 const dateLabel = document.getElementById(`dateLabel-${index}`);
                 const today = new Date();
                 dateLabel.textContent = `Dia... ${today.toLocaleDateString('pt-BR')}`;
 
-                // Cria um novo espaço de upload para a próxima imagem
+                // Cria um novo espaço de upload para a próxima imagem (se quiser continuar)
                 addNewUploadField();
             }
+        }
+
+        // Exclui a imagem carregada (reseta input e preview)
+        function deleteImage(index) {
+            // Limpa o src da imagem
+            document.getElementById(`preview-${index}`).src = "";
+            // Reseta o valor do input file
+            document.getElementById(`file-${index}`).value = "";
+            // Esconde o botão Excluir
+            document.getElementById(`deleteButton-${index}`).style.display = "none";
+            // Opcional: pode também limpar a data
+            document.getElementById(`dateLabel-${index}`).textContent = "";
         }
 
         // Adiciona um novo espaço para upload
@@ -191,6 +262,10 @@
             dateLabel.classList.add("date-label");
             dateLabel.id = `dateLabel-${index}`;
 
+            // Envoltório do input file
+            const fileWrapper = document.createElement("div");
+            fileWrapper.classList.add("file-input-wrapper");
+
             const fileInput = document.createElement("input");
             fileInput.type = "file";
             fileInput.id = `file-${index}`;
@@ -199,12 +274,33 @@
                 handleFileSelect(this, index);
             };
 
+            // Botão customizado para chamar o input
+            const customButton = document.createElement("button");
+            customButton.classList.add("custom-file-button");
+            customButton.type = "button";
+            customButton.textContent = "Carregar Imagem";
+            customButton.onclick = function() {
+                triggerFileSelect(index);
+            };
+
+            fileWrapper.appendChild(fileInput);
+            fileWrapper.appendChild(customButton);
+
             const imgPreview = document.createElement("img");
             imgPreview.id = `preview-${index}`;
 
+            const deleteBtn = document.createElement("button");
+            deleteBtn.classList.add("delete-image-button");
+            deleteBtn.id = `deleteButton-${index}`;
+            deleteBtn.textContent = "Excluir Imagem";
+            deleteBtn.onclick = function() {
+                deleteImage(index);
+            };
+
             container.appendChild(dateLabel);
-            container.appendChild(fileInput);
+            container.appendChild(fileWrapper);
             container.appendChild(imgPreview);
+            container.appendChild(deleteBtn);
             uploadSection.appendChild(container);
         }
 
