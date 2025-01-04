@@ -85,7 +85,7 @@
             <tr>
                 <th>Remédio e Dosagem (mg)</th>
                 <th>Como Tomar</th>
-                <th>Ação</th>
+                <th>Excluir</th>
             </tr>
         </thead>
         <tbody>
@@ -117,81 +117,4 @@
 
         // Permite alterar o nome
         function changeName() {
-            const nameInput = document.getElementById("nameInput");
-            const setNameButton = document.getElementById("setNameButton");
-            const changeNameButton = document.getElementById("changeNameButton");
-
-            nameInput.style.display = "inline-block";
-            setNameButton.style.display = "inline-block";
-            changeNameButton.style.display = "none";
-        }
-
-        // Lida com o upload da imagem
-        function handleFileSelect(input, index) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById(`preview-${index}`).src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-
-                // Atualiza a data com a data do upload
-                const dateLabel = document.getElementById(`dateLabel-${index}`);
-                const today = new Date();
-                dateLabel.textContent = `Dia... ${today.toLocaleDateString('pt-BR')}`;
-
-                // Cria um novo espaço de upload após o upload atual
-                addNewUploadField();
-            }
-        }
-
-        // Adiciona um novo espaço para upload
-        function addNewUploadField() {
-            const uploadSection = document.getElementById("uploadSection");
-
-            const container = document.createElement("div");
-            container.classList.add("image-container");
-
-            const dateLabel = document.createElement("span");
-            dateLabel.classList.add("date-label");
-            dateLabel.id = `dateLabel-${imageCount}`;
-
-            const fileInput = document.createElement("input");
-            fileInput.type = "file";
-            fileInput.id = `file-${imageCount}`;
-            fileInput.accept = "image/*";
-            fileInput.onchange = function () {
-                handleFileSelect(this, imageCount);
-            };
-
-            const imgPreview = document.createElement("img");
-            imgPreview.id = `preview-${imageCount}`;
-
-            container.appendChild(dateLabel);
-            container.appendChild(fileInput);
-            container.appendChild(imgPreview);
-            uploadSection.appendChild(container);
-
-            imageCount++;
-        }
-
-        // Função para adicionar uma nova linha na tabela
-        function addRow() {
-            const table = document.getElementById("medicationTable").getElementsByTagName("tbody")[0];
-            const newRow = table.insertRow();
-
-            newRow.innerHTML = `
-                <td><input type="text" class="table-input" placeholder="Remédio e Dosagem (mg)"></td>
-                <td><input type="text" class="table-input" placeholder="Como tomar"></td>
-                <td><input type="checkbox"></td>
-            `;
-        }
-
-        // Função para excluir linhas selecionadas
-        function deleteSelected() {
-            const table = document.getElementById("medicationTable").getElementsByTagName("tbody")[0];
-            const rows = table.rows;
-
-            for (let i = rows.length - 1; i >= 0; i--) {
-                const checkbox = rows
+            const nameInput = document.getElementById("nameInput
