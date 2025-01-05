@@ -1,6 +1,6 @@
 {
   "name": "Remedio do Dia",
-  "short_name": "Receitas",
+  "short_name": "Remedio do Dia",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
