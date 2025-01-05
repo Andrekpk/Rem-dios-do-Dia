@@ -135,10 +135,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <!-- Ícone usado na tela de início (em vez do manifesto no iOS) -->
     <link rel="apple-touch-icon" href="Remedio dia.png.jpg">
-
 </head>
 <body>
-
     <!-- LOGO SUPERIOR -->
     <div class="logo-top">
         <img src="Design sem nome.png.jpeg" alt="Logo Topo" style="max-height: 150px;">
@@ -195,6 +193,227 @@
     </div>
 
     <script>
+        /* =============== IndexedDB SETUP =============== */
+        let db = null;
+        const DB_NAME = "meuDB";
+        const DB_VERSION = 1;
+        const STORE_CONFIG = {
+          nomeUsuario: "nomeUsuarioStore",
+          imagens: "imagensStore",
+          tabela: "tabelaStore"
+        };
+
+        function openDatabase() {
+          const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+          request.onupgradeneeded = function(e) {
+            db = e.target.result;
+            // Nome do usuário (apenas 1 registro)
+            if (!db.objectStoreNames.contains(STORE_CONFIG.nomeUsuario)) {
+              db.createObjectStore(STORE_CONFIG.nomeUsuario, { keyPath: "id" });
+            }
+            // Armazenar imagens
+            if (!db.objectStoreNames.contains(STORE_CONFIG.imagens)) {
+              db.createObjectStore(STORE_CONFIG.imagens, { keyPath: "id", autoIncrement: true });
+            }
+            // Armazenar linhas da tabela
+            if (!db.objectStoreNames.contains(STORE_CONFIG.tabela)) {
+              db.createObjectStore(STORE_CONFIG.tabela, { keyPath: "id", autoIncrement: true });
+            }
+          };
+
+          request.onsuccess = function(e) {
+            db = e.target.result;
+            console.log("Banco aberto com sucesso!");
+            // Carregar dados ao iniciar
+            loadUserName();
+            loadImages();
+            loadTableData();
+          };
+
+          request.onerror = function(e) {
+            console.error("Erro ao abrir IndexedDB", e);
+          };
+        }
+
+        /* =============== SALVAR/CARREGAR O NOME DO USUÁRIO =============== */
+        function saveUserNameToDB(nome) {
+          const transaction = db.transaction([STORE_CONFIG.nomeUsuario], "readwrite");
+          const store = transaction.objectStore(STORE_CONFIG.nomeUsuario);
+
+          // Limpar qualquer registro anterior (para manter só 1)
+          const clearReq = store.clear();
+          clearReq.onsuccess = () => {
+            // Em seguida, adiciona
+            store.add({ id: 1, nomeUsuario: nome });
+          };
+        }
+
+        function loadUserName() {
+          const transaction = db.transaction([STORE_CONFIG.nomeUsuario], "readonly");
+          const store = transaction.objectStore(STORE_CONFIG.nomeUsuario);
+          const getReq = store.get(1); // como definimos id=1, pegamos o registro
+
+          getReq.onsuccess = function(e) {
+            const data = e.target.result;
+            if (data) {
+              // Se existir um nome salvo
+              const userName = document.getElementById("userName");
+              userName.textContent = data.nomeUsuario;
+              // Esconder input e mostrar "Trocar Nome"
+              document.getElementById("nameInput").style.display = "none";
+              document.getElementById("okButton").style.display = "none";
+              document.getElementById("changeNameButton").style.display = "inline-block";
+            }
+          };
+        }
+
+        /* =============== SALVAR/CARREGAR IMAGENS =============== */
+        // Salvar imagem (base64) no IndexedDB
+        function saveImageToDB(base64Str, dateString) {
+          const transaction = db.transaction([STORE_CONFIG.imagens], "readwrite");
+          const store = transaction.objectStore(STORE_CONFIG.imagens);
+          // Ex: { imagemBase64: "...", data: "..." }
+          store.add({ imagemBase64: base64Str, data: dateString });
+        }
+
+        // Carregar todas as imagens salvas e recriar containers
+        function loadImages() {
+          const transaction = db.transaction([STORE_CONFIG.imagens], "readonly");
+          const store = transaction.objectStore(STORE_CONFIG.imagens);
+          const request = store.openCursor();
+
+          request.onsuccess = function(e) {
+            const cursor = e.target.result;
+            if (cursor) {
+              const record = cursor.value;
+              // Recriar visualmente
+              createImageContainerFromDB(record.id, record.imagemBase64, record.data);
+              cursor.continue();
+            }
+          };
+        }
+
+        // Função auxiliar para recriar a imagem na tela
+        function createImageContainerFromDB(idDB, base64, dateString) {
+          // Cria um container .image-container
+          const uploadSection = document.getElementById("uploadSection");
+
+          // ID único para a div
+          const container = document.createElement("div");
+          container.classList.add("image-container");
+          container.id = `image-container-db-${idDB}`;
+
+          const dateLabel = document.createElement("span");
+          dateLabel.classList.add("date-label");
+          dateLabel.textContent = `Dia... ${new Date(dateString).toLocaleDateString('pt-BR')}`;
+
+          const fileWrapper = document.createElement("div");
+          fileWrapper.classList.add("file-input-wrapper");
+
+          // Aqui não precisamos do input pois já é do DB, mas iremos manter se quiser
+          // (poderia remover e manter só o preview)
+          // fileWrapper.innerHTML = `<input type="file" style="display:none">`;
+
+          const customButton = document.createElement("button");
+          customButton.classList.add("custom-file-button");
+          customButton.type = "button";
+          customButton.textContent = "Carregar Imagem";
+          customButton.disabled = true; // Desabilitado, pois já está salvo
+
+          fileWrapper.appendChild(customButton);
+
+          const imgPreview = document.createElement("img");
+          imgPreview.src = base64;
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.classList.add("delete-image-button");
+          deleteBtn.textContent = "Excluir Imagem";
+          deleteBtn.onclick = function() {
+            // Deletar do DB
+            deleteImageFromDB(idDB).then(() => {
+              container.remove();
+            });
+          };
+
+          container.appendChild(dateLabel);
+          container.appendChild(fileWrapper);
+          container.appendChild(imgPreview);
+          container.appendChild(deleteBtn);
+
+          uploadSection.appendChild(container);
+        }
+
+        // Deleta imagem do DB
+        function deleteImageFromDB(idDB) {
+          return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_CONFIG.imagens], "readwrite");
+            const store = transaction.objectStore(STORE_CONFIG.imagens);
+            const request = store.delete(idDB);
+            request.onsuccess = function() {
+              console.log("Imagem removida do DB");
+              resolve();
+            };
+            request.onerror = function(e) {
+              reject(e);
+            };
+          });
+        }
+
+        /* =============== SALVAR/CARREGAR DADOS DA TABELA =============== */
+        function saveTableDataToDB() {
+          const table = document.getElementById("medicationTable").querySelector("tbody");
+          const rows = table.querySelectorAll("tr");
+          
+          const transaction = db.transaction([STORE_CONFIG.tabela], "readwrite");
+          const store = transaction.objectStore(STORE_CONFIG.tabela);
+
+          // Limpar antes de gravar tudo (você pode adotar outra estratégia)
+          const clearReq = store.clear();
+          clearReq.onsuccess = function() {
+            rows.forEach((row) => {
+              const inputs = row.querySelectorAll("input.table-input");
+              // inputs[0]: Remédio e Dosagem
+              // inputs[1]: Como Tomar
+              const data = {
+                remedio: inputs[0].value,
+                comoTomar: inputs[1].value
+              };
+              store.add(data);
+            });
+          };
+        }
+
+        function loadTableData() {
+          const transaction = db.transaction([STORE_CONFIG.tabela], "readonly");
+          const store = transaction.objectStore(STORE_CONFIG.tabela);
+          const request = store.openCursor();
+          const tableBody = document.getElementById("medicationTable").querySelector("tbody");
+          
+          // Limpar antes de recriar
+          tableBody.innerHTML = "";
+
+          request.onsuccess = function(e) {
+            const cursor = e.target.result;
+            if (cursor) {
+              const record = cursor.value;
+              // Recriar a linha
+              const newRow = tableBody.insertRow();
+              newRow.innerHTML = `
+                <td><input type="text" class="table-input" placeholder="Remédio e Dosagem (mg)" value="${record.remedio || ''}"></td>
+                <td><input type="text" class="table-input" placeholder="Como tomar" value="${record.comoTomar || ''}"></td>
+                <td><input type="checkbox"></td>
+              `;
+              cursor.continue();
+            }
+          };
+        }
+
+        /* =============== ABRIR O BANCO AO CARREGAR A PÁGINA =============== */
+        window.addEventListener('load', () => {
+          openDatabase();
+        });
+
         // Define o nome do usuário e altera o layout
         function setName() {
             const nameInput = document.getElementById("nameInput");
@@ -203,10 +422,12 @@
             const changeNameButton = document.getElementById("changeNameButton");
 
             if (nameInput.value.trim() !== "") {
-                userName.textContent = nameInput.value; // Atualiza o título
-                nameInput.style.display = "none";        // Esconde o campo de texto
-                okButton.style.display = "none";         // Esconde o botão OK
-                changeNameButton.style.display = "inline-block"; // Mostra o botão de trocar nome
+                userName.textContent = nameInput.value; 
+                nameInput.style.display = "none";
+                okButton.style.display = "none";
+                changeNameButton.style.display = "inline-block";
+                // Salvar no DB
+                saveUserNameToDB(nameInput.value);
             } else {
                 alert("Por favor, insira um nome válido.");
             }
@@ -218,9 +439,9 @@
             const okButton = document.getElementById("okButton");
             const changeNameButton = document.getElementById("changeNameButton");
 
-            nameInput.style.display = "inline-block"; // Mostra o campo de texto
-            okButton.style.display = "inline-block";  // Mostra o botão OK
-            changeNameButton.style.display = "none";   // Esconde o botão de trocar nome
+            nameInput.style.display = "inline-block";
+            okButton.style.display = "inline-block";
+            changeNameButton.style.display = "none";
         }
 
         // Dispara o clique do input file escondido
@@ -234,37 +455,42 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    // Seta preview na tela
                     document.getElementById(`preview-${index}`).src = e.target.result;
+                    // Mostra o botão excluir
+                    document.getElementById(`deleteButton-${index}`).style.display = "inline-block";
+
+                    // Atualiza a data
+                    const dateLabel = document.getElementById(`dateLabel-${index}`);
+                    const today = new Date();
+                    dateLabel.textContent = `Dia... ${today.toLocaleDateString('pt-BR')}`;
+
+                    // Salva no IndexedDB (imagem + data)
+                    saveImageToDB(e.target.result, today.toISOString());
+
+                    // Cria espaço para próxima imagem
+                    addNewUploadField();
                 };
                 reader.readAsDataURL(file);
-
-                // Mostra o botão excluir
-                document.getElementById(`deleteButton-${index}`).style.display = "inline-block";
-
-                // Atualiza a data com a data do upload
-                const dateLabel = document.getElementById(`dateLabel-${index}`);
-                const today = new Date();
-                dateLabel.textContent = `Dia... ${today.toLocaleDateString('pt-BR')}`;
-
-                // Cria um novo espaço de upload para a próxima imagem
-                addNewUploadField();
             }
         }
 
-        // Remove todo o container (toda a célula) ao clicar em "Excluir Imagem"
+        // Remove todo o container (toda a célula) ao clicar em "Excluir Imagem" (versão local sem DB)
+        // Obs: se a imagem foi salva no DB, acima implementamos um outro método (deleteImageFromDB) para remover.
         function deleteImage(index) {
             const container = document.getElementById(`image-container-${index}`);
             if (container) {
                 container.remove(); 
             }
+            // Aqui não excluímos do DB pois esse "index" é para imagens recém-carregadas
+            // Se quiser excluir do DB, você precisará adequar a lógica (ex: buscar ID do record).
         }
 
-        // Adiciona um novo espaço para upload
+        // Adiciona um novo espaço para upload (local)
         function addNewUploadField() {
             const uploadSection = document.getElementById("uploadSection");
             let index = uploadSection.querySelectorAll(".image-container").length;
 
-            // Cria a div principal e atribui um ID único
             const container = document.createElement("div");
             container.classList.add("image-container");
             container.id = `image-container-${index}`;
@@ -273,7 +499,6 @@
             dateLabel.classList.add("date-label");
             dateLabel.id = `dateLabel-${index}`;
 
-            // Envoltório do input file
             const fileWrapper = document.createElement("div");
             fileWrapper.classList.add("file-input-wrapper");
 
@@ -285,7 +510,6 @@
                 handleFileSelect(this, index);
             };
 
-            // Botão customizado para chamar o input
             const customButton = document.createElement("button");
             customButton.classList.add("custom-file-button");
             customButton.type = "button";
@@ -308,13 +532,11 @@
                 deleteImage(index);
             };
 
-            // Monta tudo dentro do container
             container.appendChild(dateLabel);
             container.appendChild(fileWrapper);
             container.appendChild(imgPreview);
             container.appendChild(deleteBtn);
 
-            // Adiciona no uploadSection
             uploadSection.appendChild(container);
         }
 
@@ -328,6 +550,8 @@
                 <td><input type="text" class="table-input" placeholder="Como tomar"></td>
                 <td><input type="checkbox"></td>
             `;
+            // Salvar imediatamente
+            saveTableDataToDB();
         }
 
         // Função para excluir linhas selecionadas
@@ -341,7 +565,11 @@
                     table.deleteRow(i);
                 }
             }
+            saveTableDataToDB();
         }
+
+        // Sempre que alguém alterar algo na tabela, podemos salvar novamente.
+        // Você pode ligar esse evento de várias formas, ex. oninput nos <input table-input> etc.
 
         /* --- REGISTRO DO SERVICE WORKER (INSERIDO AO FINAL DO SCRIPT) --- */
         if ('serviceWorker' in navigator) {
