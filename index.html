@@ -334,6 +334,16 @@
                 }
             }
         }
+
+        /* --- REGISTRO DO SERVICE WORKER (INSERIDO AO FINAL DO SCRIPT) --- */
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker
+              .register('./service-worker.js')
+              .then(() => console.log('Service Worker registrado!'))
+              .catch(err => console.error('Erro no registro do Service Worker:', err));
+          });
+        }
     </script>
 </body>
 </html>
