@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Gerenciador de Receitas</title>
+    <title>Remedio do Dia</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -124,17 +124,21 @@
             border-color: #bd2130;
         }
     </style>
+
+    <!-- Referências para PWA (caso utilize) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
 </head>
 <body>
 
     <!-- LOGO SUPERIOR -->
     <div class="logo-top">
-        <!-- Ajuste a altura para o valor que achar melhor -->
         <img src="Design sem nome.png" alt="Logo Topo" style="max-height: 150px;">
     </div>
 
     <div class="title-container">
-        <h1 id="pageTitle">Remédio de <span id="userName">_______</span></h1>
+        <!-- Título alterado para "Remedio do Dia" -->
+        <h1 id="pageTitle">Remedio do Dia <span id="userName">_______</span></h1>
         <input type="text" id="nameInput" placeholder="Digite o nome">
         <button id="okButton" onclick="setName()">OK</button>
         <button id="changeNameButton" onclick="changeName()" style="display: none;">Trocar Nome</button>
