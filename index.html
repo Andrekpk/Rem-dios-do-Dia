@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Remédio Uso Contínuo">
+    <meta name="apple-mobile-web-app-title" content="Medicamentos de Uso Contínuo (MUC)">
     <link rel="apple-touch-icon" href="Remedio dia.png.jpg">
     <meta charset="UTF-8">
-    <title>Remédio Uso Contínuo</title>
+    <title>Medicamentos de Uso Contínuo (MUC)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,8 +78,8 @@
         <img src="Design sem nome.png.jpeg" alt="Logo Topo" style="max-height: 150px;">
     </div>
 
-    <h1>Remédio Uso Contínuo</h1>
-    <p class="subtitle">📸 Tire foto da receita ou da caixa<br><strong>Guarde aqui seus remédios de uso contínuo</strong></p>
+    <h1>Medicamentos de Uso Contínuo (MUC)</h1>
+    <p class="subtitle">📸 Tire foto da receita ou da caixa<br><strong>Guarde aqui seus medicamentos de uso contínuo (MUC)</strong></p>
 
     <div id="uploadSection">
         <!-- Fotos aparecem aqui -->
@@ -92,7 +92,7 @@
 
     <script>
         let db = null;
-        const DB_NAME = "RemedioUsoContinuo";
+        const DB_NAME = "MUC_DB";
         const DB_VERSION = 1;
 
         function openDatabase() {
@@ -106,7 +106,7 @@
           request.onsuccess = function(e) {
             db = e.target.result;
             loadImages();
-            addNewUploadField(); // cria primeiro campo vazio
+            addNewUploadField();
           };
         }
 
@@ -190,8 +190,8 @@
                 const base64 = e.target.result;
                 saveImageToDB(base64);
                 createImageContainer(Date.now(), base64, new Date().toISOString());
-                addNewUploadField(); // cria novo campo vazio
-                container.remove(); // remove o campo vazio antigo
+                addNewUploadField();
+                container.remove();
               };
               reader.readAsDataURL(file);
             }
