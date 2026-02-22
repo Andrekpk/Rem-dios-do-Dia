@@ -24,7 +24,18 @@
             text-align: center;
             font-size: 19px;
             color: #555;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
+        }
+        .share-all-btn {
+            background-color: #25D366 !important;
+            color: white;
+            font-size: 18px;
+            padding: 16px;
+            margin: 15px 0 25px 0;
+            border-radius: 10px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
         }
         .logo-top, .logo-bottom {
             text-align: center;
@@ -35,7 +46,7 @@
             background: transparent;
         }
         .logo-bottom img {
-            max-height: 95px;      /* ← reduzido conforme pedido */
+            max-height: 95px;
             background: transparent;
         }
         .image-container {
@@ -81,7 +92,7 @@
 </head>
 <body>
 
-    <!-- LOGO SUPERIOR (novo nome com fundo transparente) -->
+    <!-- LOGO SUPERIOR -->
     <div class="logo-top">
         <img src="Design_sem_nome.png-removebg-preview.png" alt="Logo Topo">
     </div>
@@ -89,11 +100,16 @@
     <h1>Medicamentos de Uso Contínuo (MUC)</h1>
     <p class="subtitle">📸 Tire foto da receita ou da caixa<br><strong>Guarde aqui seus medicamentos de uso contínuo (MUC)</strong></p>
 
+    <!-- BOTÃO NOVO: COMPARTILHAR TODAS DE UMA VEZ -->
+    <button onclick="shareAllPhotos()" class="share-all-btn">
+        📤 Compartilhar TODAS as Fotos no WhatsApp
+    </button>
+
     <div id="uploadSection">
         <!-- Fotos aparecem aqui -->
     </div>
 
-    <!-- LOGO INFERIOR (clínica Geriatria - reduzido) -->
+    <!-- LOGO INFERIOR -->
     <div class="logo-bottom">
         <img src="Logo.png" alt="Logo Rodapé">
     </div>
@@ -210,6 +226,37 @@
           container.appendChild(fileWrapper);
           section.appendChild(container);
         }
+
+        // ==================== BOTÃO NOVO ====================
+        async function shareAllPhotos() {
+          const images = document.querySelectorAll('#uploadSection img');
+          if (images.length === 0) {
+            alert("Nenhuma foto salva ainda!");
+            return;
+          }
+
+          try {
+            const files = [];
+            for (let img of images) {
+              const res = await fetch(img.src);
+              const blob = await res.blob();
+              const fileName = `MUC_${new Date().toISOString().slice(0,10)}.jpg`;
+              const file = new File([blob], fileName, { type: 'image/jpeg' });
+              files.push(file);
+            }
+
+            await navigator.share({
+              title: 'Medicamentos de Uso Contínuo (MUC)',
+              text: 'Fotos das minhas receitas e medicamentos de uso contínuo.\nCompartilhando conforme meu desejo.',
+              files: files
+            });
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              alert('Compartilhamento cancelado ou não disponível neste momento.');
+            }
+          }
+        }
+        // ====================================================
 
         window.addEventListener('load', () => {
           openDatabase();
