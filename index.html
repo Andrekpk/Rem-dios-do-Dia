@@ -1,16 +1,12 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <!-- OTIMIZAÇÃO FORTE PARA IPHONE - NOME "MUC" -->
+    <!-- OTIMIZAÇÃO PARA IPHONE -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- NOME QUE APARECE NA TELA INICIAL (o mais importante) -->
     <meta name="apple-mobile-web-app-title" content="MUC">
-    
-    <!-- Reforço extra para Safari -->
     <meta name="application-name" content="MUC">
-    
-    <!-- Ícone oficial -->
     <link rel="apple-touch-icon" sizes="180x180" href="muc-icon-180.png">
 
     <meta charset="UTF-8">
@@ -64,12 +60,6 @@
             color: #444;
             line-height: 1.5;
             text-align: center;
-        }
-        .donation-text {
-            text-align: center;
-            font-size: 15px;
-            color: #555;
-            margin: 10px 0 30px 0;
         }
         .logo-top, .logo-bottom {
             text-align: center;
@@ -138,27 +128,23 @@
         <!-- Fotos aparecem aqui -->
     </div>
 
-    <!-- BOTÃO COMPARTILHAR (agora acima do Pix) -->
+    <!-- BOTÃO COMPARTILHAR -->
     <button onclick="shareAllPhotos()" class="share-all-btn">
         📤 Compartilhar TODAS as Fotos no WhatsApp
     </button>
 
-    <!-- DOAÇÃO PIX -->
+    <!-- BOTÃO PIX -->
     <button onclick="doarPix()" class="pix-btn">
-        ❤️ Apoiar com Pix – Qualquer valor
+        ☕ Pague pro MUC um Café..
     </button>
 
-    <!-- DISCLAIMER LGPD -->
+    <!-- LGPD -->
     <div class="lgpd-box">
         ✅ <strong>Este app é 100% GRÁTIS</strong> e armazena todas as fotos <strong>APENAS no seu celular</strong>.<br>
         Você decide com quem compartilhar (filhos, médico, hospital...).<br>
         Não enviamos nenhum dado para a internet.<br>
         Tudo conforme a <strong>LGPD</strong>. Use com total tranquilidade ❤️
     </div>
-
-    <p class="donation-text">
-        Sua doação ajuda a manter e melhorar o app para mais pessoas ❤️
-    </p>
 
     <!-- LOGO INFERIOR -->
     <div class="logo-bottom">
@@ -305,9 +291,9 @@
         function doarPix() {
           const chavePix = "46991159004";
           navigator.clipboard.writeText(chavePix).then(() => {
-            alert(`✅ Chave Pix copiada!\n\nNúmero: (46) 99115-9004\n\nAbra seu app do banco, cole a chave e doe o valor que quiser.\n\nMuito obrigado pelo apoio! ❤️\nDr. Andre`);
+            alert(`✅ Chave Pix copiada!\n\nNúmero: (46) 99115-9004\n\nAbra seu app do banco, cole a chave e doe o valor que quiser.\n\nMuito obrigado pelo apoio! ❤️\nAndre K`);
           }).catch(() => {
-            alert(`Chave Pix: 46991159004\n\nNúmero: (46) 99115-9004\n\nCopie manualmente e doe no seu banco.\nObrigado! ❤️`);
+            alert(`Chave Pix: 46991159004\n\nNúmero: (46) 99115-9004\n\nCopie manualmente e doe no seu banco.\nObrigado! ❤️\nAndre K`);
           });
         }
 
