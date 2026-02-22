@@ -1,196 +1,89 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><!-- MELHORIA PARA IPHONE -->
+<head>
+    <!-- MELHORIA PARA IPHONE -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Remédios do Dia">
-    <link rel="apple-touch-icon" href="Remedio dia.png.jpg">  <!-- já tem, ótimo -->
+    <meta name="apple-mobile-web-app-title" content="Remédio Uso Contínuo">
+    <link rel="apple-touch-icon" href="Remedio dia.png.jpg">
     <meta charset="UTF-8">
-    <title>Remedio do Dia</title> <!-- Título da página (pode ajustar se quiser) -->
+    <title>Remédio Uso Contínuo</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f9f9f9;
         }
         h1 {
             text-align: center;
-        }
-        .title-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .title-container button {
-            margin-top: 10px;
-            font-size: 12px;
             color: #007bff;
-            background: none;
-            border: none;
-            cursor: pointer;
-            text-decoration: underline;
+            font-size: 28px;
         }
-        .title-container button:hover {
-            color: #0056b3;
-        }
-
-        /* Container do logotipo no topo */
-        .logo-top {
+        .subtitle {
             text-align: center;
-            margin-bottom: 20px;
+            font-size: 19px;
+            color: #555;
+            margin-bottom: 25px;
         }
-        /* Container do logotipo no rodapé */
-        .logo-bottom {
+        .logo-top, .logo-bottom {
             text-align: center;
-            margin-top: 20px;
+            margin: 15px 0;
         }
-
         .image-container {
             border: 1px solid #ccc;
-            padding: 10px;
+            padding: 15px;
             margin-bottom: 20px;
             width: 100%; 
             box-sizing: border-box;
             text-align: center;
+            background: white;
+            border-radius: 10px;
         }
         .image-container img {
             width: 100%;
             height: auto;
             display: block;
             margin: 10px auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        input.table-input {
-            width: 90%;
-            padding: 5px;
-            box-sizing: border-box;
+            border-radius: 8px;
         }
         button {
-            padding: 10px 15px;
+            padding: 14px 20px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 17px;
+            width: 100%;
+            margin: 8px 0;
         }
         button:hover {
             background-color: #0056b3;
         }
-
-        /* --- Novo estilo para esconder o input file e criar um botão customizado --- */
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-        /* Esconde o input de arquivo real */
-        .file-input-wrapper input[type="file"] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        /* Botão customizado para chamar o input file */
-        .custom-file-button {
-            display: inline-block;
-            padding: 8px 15px;
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-            border-radius: 4px;
-            margin-top: 10px;
-            border: 1px solid #007bff;
-        }
-        .custom-file-button:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-        /* Botão excluir imagem */
         .delete-image-button {
-            display: none; /* Começa invisível até que a imagem seja carregada */
-            margin-top: 10px;
             background-color: #dc3545;
-            border-color: #dc3545;
         }
         .delete-image-button:hover {
             background-color: #c82333;
-            border-color: #bd2130;
         }
     </style>
-
-    <!-- Referências para PWA (caso utilize) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
-
-    <!-- Torna o site “capable” de web app fullscreen -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- Controla a cor da barra de status -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <!-- Ícone usado na tela de início (em vez do manifesto no iOS) -->
-    <link rel="apple-touch-icon" href="Remedio dia.png.jpg">
 </head>
 <body>
+
     <!-- LOGO SUPERIOR -->
     <div class="logo-top">
         <img src="Design sem nome.png.jpeg" alt="Logo Topo" style="max-height: 150px;">
     </div>
 
-    <div class="title-container">
-        <!-- Alterado para "Remedio de" -->
-        <h1 id="pageTitle">Remedio de <span id="userName">_______</span></h1>
-        <input type="text" id="nameInput" placeholder="Remédio da(o)">
-        <button id="okButton" onclick="setName()">OK</button>
-        <button id="changeNameButton" onclick="changeName()" style="display: none;">Trocar Nome</button>
-    </div>
+    <h1>Remédio Uso Contínuo</h1>
+    <p class="subtitle">📸 Tire foto da receita ou da caixa<br><strong>Guarde aqui seus remédios de uso contínuo</strong></p>
 
     <div id="uploadSection">
-        <!-- Primeiro container (index 0) -->
-        <div class="image-container" id="image-container-0">
-            <span class="date-label" id="dateLabel-0"></span>
-
-            <!-- ENVOLTÓRIO para esconder input file e mostrar botão custom -->
-            <div class="file-input-wrapper">
-             <input type="file" id="file-0" accept="image/*" capture="environment" onchange="handleFileSelect(this, 0)">
-                <button class="custom-file-button" type="button" onclick="triggerFileSelect(0)">
-                    Carregar Imagem
-                </button>
-            </div>
-
-            <img id="preview-0" />
-            <button class="delete-image-button" id="deleteButton-0" onclick="deleteImage(0)">
-                Excluir Imagem
-            </button>
-        </div>
+        <!-- Fotos aparecem aqui -->
     </div>
-
-    <h2>Outros remédios</h2>
-
-    <table id="medicationTable">
-        <thead>
-            <tr>
-                <th>Remédio e Dosagem (mg)</th>
-                <th>Como Tomar</th>
-                <th>Excluir</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Linhas adicionadas dinamicamente -->
-        </tbody>
-    </table>
-    <button onclick="addRow()">Adicionar</button>
-    <button onclick="deleteSelected()">Excluir</button>
 
     <!-- LOGO INFERIOR -->
     <div class="logo-bottom">
@@ -198,393 +91,121 @@
     </div>
 
     <script>
-        /* =============== IndexedDB SETUP =============== */
         let db = null;
-        const DB_NAME = "meuDB";
+        const DB_NAME = "RemedioUsoContinuo";
         const DB_VERSION = 1;
-        const STORE_CONFIG = {
-          nomeUsuario: "nomeUsuarioStore",
-          imagens: "imagensStore",
-          tabela: "tabelaStore"
-        };
 
         function openDatabase() {
           const request = indexedDB.open(DB_NAME, DB_VERSION);
-
           request.onupgradeneeded = function(e) {
             db = e.target.result;
-            // Nome do usuário (apenas 1 registro)
-            if (!db.objectStoreNames.contains(STORE_CONFIG.nomeUsuario)) {
-              db.createObjectStore(STORE_CONFIG.nomeUsuario, { keyPath: "id" });
-            }
-            // Armazenar imagens
-            if (!db.objectStoreNames.contains(STORE_CONFIG.imagens)) {
-              db.createObjectStore(STORE_CONFIG.imagens, { keyPath: "id", autoIncrement: true });
-            }
-            // Armazenar linhas da tabela
-            if (!db.objectStoreNames.contains(STORE_CONFIG.tabela)) {
-              db.createObjectStore(STORE_CONFIG.tabela, { keyPath: "id", autoIncrement: true });
+            if (!db.objectStoreNames.contains("imagens")) {
+              db.createObjectStore("imagens", { keyPath: "id", autoIncrement: true });
             }
           };
-
           request.onsuccess = function(e) {
             db = e.target.result;
-            console.log("Banco aberto com sucesso!");
-            // Carregar dados ao iniciar
-            loadUserName();
             loadImages();
-            loadTableData();
-          };
-
-          request.onerror = function(e) {
-            console.error("Erro ao abrir IndexedDB", e);
+            addNewUploadField(); // cria primeiro campo vazio
           };
         }
 
-        /* =============== SALVAR/CARREGAR O NOME DO USUÁRIO =============== */
-        function saveUserNameToDB(nome) {
-          const transaction = db.transaction([STORE_CONFIG.nomeUsuario], "readwrite");
-          const store = transaction.objectStore(STORE_CONFIG.nomeUsuario);
-
-          // Limpar qualquer registro anterior (para manter só 1)
-          const clearReq = store.clear();
-          clearReq.onsuccess = () => {
-            // Em seguida, adiciona
-            store.add({ id: 1, nomeUsuario: nome });
-          };
+        function saveImageToDB(base64Str) {
+          const transaction = db.transaction(["imagens"], "readwrite");
+          const store = transaction.objectStore("imagens");
+          const today = new Date();
+          store.add({ imagemBase64: base64Str, data: today.toISOString() });
         }
 
-        function loadUserName() {
-          const transaction = db.transaction([STORE_CONFIG.nomeUsuario], "readonly");
-          const store = transaction.objectStore(STORE_CONFIG.nomeUsuario);
-          const getReq = store.get(1); // como definimos id=1, pegamos o registro
-
-          getReq.onsuccess = function(e) {
-            const data = e.target.result;
-            if (data) {
-              // Se existir um nome salvo
-              const userName = document.getElementById("userName");
-              userName.textContent = data.nomeUsuario;
-              // Esconder input e mostrar "Trocar Nome"
-              document.getElementById("nameInput").style.display = "none";
-              document.getElementById("okButton").style.display = "none";
-              document.getElementById("changeNameButton").style.display = "inline-block";
-            }
-          };
-        }
-
-        /* =============== SALVAR/CARREGAR IMAGENS =============== */
-        // Salvar imagem (base64) no IndexedDB
-        function saveImageToDB(base64Str, dateString) {
-          const transaction = db.transaction([STORE_CONFIG.imagens], "readwrite");
-          const store = transaction.objectStore(STORE_CONFIG.imagens);
-          // Ex: { imagemBase64: "...", data: "..." }
-          store.add({ imagemBase64: base64Str, data: dateString });
-        }
-
-        // Carregar todas as imagens salvas e recriar containers
         function loadImages() {
-          const transaction = db.transaction([STORE_CONFIG.imagens], "readonly");
-          const store = transaction.objectStore(STORE_CONFIG.imagens);
+          const transaction = db.transaction(["imagens"], "readonly");
+          const store = transaction.objectStore("imagens");
           const request = store.openCursor();
-
           request.onsuccess = function(e) {
             const cursor = e.target.result;
             if (cursor) {
-              const record = cursor.value;
-              // Recriar visualmente
-              createImageContainerFromDB(record.id, record.imagemBase64, record.data);
+              createImageContainer(cursor.value.id, cursor.value.imagemBase64, cursor.value.data);
               cursor.continue();
             }
           };
         }
 
-        // Função auxiliar para recriar a imagem na tela
-        function createImageContainerFromDB(idDB, base64, dateString) {
-          // Cria um container .image-container
-          const uploadSection = document.getElementById("uploadSection");
-
-          // ID único para a div
+        function createImageContainer(idDB, base64, dateString) {
+          const section = document.getElementById("uploadSection");
           const container = document.createElement("div");
-          container.classList.add("image-container");
-          container.id = `image-container-db-${idDB}`;
+          container.className = "image-container";
+          container.id = `container-${idDB}`;
 
           const dateLabel = document.createElement("span");
-          dateLabel.classList.add("date-label");
-          dateLabel.textContent = `Dia... ${new Date(dateString).toLocaleDateString('pt-BR')}`;
+          dateLabel.style.display = "block";
+          dateLabel.style.textAlign = "center";
+          dateLabel.style.fontWeight = "bold";
+          dateLabel.style.color = "#007bff";
+          dateLabel.textContent = `📅 ${new Date(dateString).toLocaleDateString('pt-BR')}`;
 
-          const fileWrapper = document.createElement("div");
-          fileWrapper.classList.add("file-input-wrapper");
-
-          // Aqui não precisamos do input pois já é do DB, mas iremos manter se quiser
-          // (poderia remover e manter só o preview)
-          // fileWrapper.innerHTML = `<input type="file" style="display:none">`;
-
-          const customButton = document.createElement("button");
-          customButton.classList.add("custom-file-button");
-          customButton.type = "button";
-          customButton.textContent = "Carregar Imagem";
-          customButton.disabled = true; // Desabilitado, pois já está salvo
-
-          fileWrapper.appendChild(customButton);
-
-          const imgPreview = document.createElement("img");
-          imgPreview.src = base64;
+          const img = document.createElement("img");
+          img.src = base64;
 
           const deleteBtn = document.createElement("button");
-          deleteBtn.classList.add("delete-image-button");
-          deleteBtn.textContent = "Excluir Imagem";
-          deleteBtn.onclick = function() {
-            // Deletar do DB
-            deleteImageFromDB(idDB).then(() => {
-              container.remove();
-            });
-          };
+          deleteBtn.className = "delete-image-button";
+          deleteBtn.textContent = "🗑️ Excluir Foto";
+          deleteBtn.onclick = () => deleteImageFromDB(idDB, container);
 
           container.appendChild(dateLabel);
-          container.appendChild(fileWrapper);
-          container.appendChild(imgPreview);
+          container.appendChild(img);
           container.appendChild(deleteBtn);
-
-          uploadSection.appendChild(container);
+          section.appendChild(container);
         }
 
-        // Deleta imagem do DB
-        function deleteImageFromDB(idDB) {
-          return new Promise((resolve, reject) => {
-            const transaction = db.transaction([STORE_CONFIG.imagens], "readwrite");
-            const store = transaction.objectStore(STORE_CONFIG.imagens);
-            const request = store.delete(idDB);
-            request.onsuccess = function() {
-              console.log("Imagem removida do DB");
-              resolve();
-            };
-            request.onerror = function(e) {
-              reject(e);
-            };
-          });
+        function deleteImageFromDB(idDB, element) {
+          const transaction = db.transaction(["imagens"], "readwrite");
+          const store = transaction.objectStore("imagens");
+          store.delete(idDB);
+          element.remove();
         }
 
-        /* =============== SALVAR/CARREGAR DADOS DA TABELA =============== */
-        function saveTableDataToDB() {
-          const table = document.getElementById("medicationTable").querySelector("tbody");
-          const rows = table.querySelectorAll("tr");
-          
-          const transaction = db.transaction([STORE_CONFIG.tabela], "readwrite");
-          const store = transaction.objectStore(STORE_CONFIG.tabela);
+        function addNewUploadField() {
+          const section = document.getElementById("uploadSection");
+          const container = document.createElement("div");
+          container.className = "image-container";
 
-          // Limpar antes de gravar tudo (você pode adotar outra estratégia)
-          const clearReq = store.clear();
-          clearReq.onsuccess = function() {
-            rows.forEach((row) => {
-              const inputs = row.querySelectorAll("input.table-input");
-              // inputs[0]: Remédio e Dosagem
-              // inputs[1]: Como Tomar
-              const data = {
-                remedio: inputs[0].value,
-                comoTomar: inputs[1].value
+          const fileWrapper = document.createElement("div");
+          fileWrapper.style.textAlign = "center";
+
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "image/*";
+          input.capture = "environment";
+          input.style.display = "none";
+
+          const btn = document.createElement("button");
+          btn.textContent = "📷 Tirar Foto da Receita";
+          btn.onclick = () => input.click();
+
+          input.onchange = function() {
+            const file = this.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                const base64 = e.target.result;
+                saveImageToDB(base64);
+                createImageContainer(Date.now(), base64, new Date().toISOString());
+                addNewUploadField(); // cria novo campo vazio
+                container.remove(); // remove o campo vazio antigo
               };
-              store.add(data);
-            });
-          };
-        }
-
-        function loadTableData() {
-          const transaction = db.transaction([STORE_CONFIG.tabela], "readonly");
-          const store = transaction.objectStore(STORE_CONFIG.tabela);
-          const request = store.openCursor();
-          const tableBody = document.getElementById("medicationTable").querySelector("tbody");
-          
-          // Limpar antes de recriar
-          tableBody.innerHTML = "";
-
-          request.onsuccess = function(e) {
-            const cursor = e.target.result;
-            if (cursor) {
-              const record = cursor.value;
-              // Recriar a linha
-              const newRow = tableBody.insertRow();
-              newRow.innerHTML = `
-                <td><input type="text" class="table-input" placeholder="Remédio e Dosagem (mg)" value="${record.remedio || ''}"></td>
-                <td><input type="text" class="table-input" placeholder="Como tomar" value="${record.comoTomar || ''}"></td>
-                <td><input type="checkbox"></td>
-              `;
-              cursor.continue();
+              reader.readAsDataURL(file);
             }
           };
+
+          fileWrapper.appendChild(input);
+          fileWrapper.appendChild(btn);
+          container.appendChild(fileWrapper);
+          section.appendChild(container);
         }
 
-        /* =============== ABRIR O BANCO AO CARREGAR A PÁGINA =============== */
         window.addEventListener('load', () => {
           openDatabase();
         });
-
-        // Define o nome do usuário e altera o layout
-        function setName() {
-            const nameInput = document.getElementById("nameInput");
-            const userName = document.getElementById("userName");
-            const okButton = document.getElementById("okButton");
-            const changeNameButton = document.getElementById("changeNameButton");
-
-            if (nameInput.value.trim() !== "") {
-                userName.textContent = nameInput.value; 
-                nameInput.style.display = "none";
-                okButton.style.display = "none";
-                changeNameButton.style.display = "inline-block";
-                // Salvar no DB
-                saveUserNameToDB(nameInput.value);
-            } else {
-                alert("Por favor, insira um nome válido.");
-            }
-        }
-
-        // Permite alterar o nome
-        function changeName() {
-            const nameInput = document.getElementById("nameInput");
-            const okButton = document.getElementById("okButton");
-            const changeNameButton = document.getElementById("changeNameButton");
-
-            nameInput.style.display = "inline-block";
-            okButton.style.display = "inline-block";
-            changeNameButton.style.display = "none";
-        }
-
-        // Dispara o clique do input file escondido
-        function triggerFileSelect(index) {
-            document.getElementById(`file-${index}`).click();
-        }
-
-        // Lida com o upload da imagem
-        function handleFileSelect(input, index) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Seta preview na tela
-                    document.getElementById(`preview-${index}`).src = e.target.result;
-                    // Mostra o botão excluir
-                    document.getElementById(`deleteButton-${index}`).style.display = "inline-block";
-
-                    // Atualiza a data
-                    const dateLabel = document.getElementById(`dateLabel-${index}`);
-                    const today = new Date();
-                    dateLabel.textContent = `Dia... ${today.toLocaleDateString('pt-BR')}`;
-
-                    // Salva no IndexedDB (imagem + data)
-                    saveImageToDB(e.target.result, today.toISOString());
-
-                    // Cria espaço para próxima imagem
-                    addNewUploadField();
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Remove todo o container (toda a célula) ao clicar em "Excluir Imagem" (versão local sem DB)
-        // Obs: se a imagem foi salva no DB, acima implementamos um outro método (deleteImageFromDB) para remover.
-        function deleteImage(index) {
-            const container = document.getElementById(`image-container-${index}`);
-            if (container) {
-                container.remove(); 
-            }
-            // Aqui não excluímos do DB pois esse "index" é para imagens recém-carregadas
-            // Se quiser excluir do DB, você precisará adequar a lógica (ex: buscar ID do record).
-        }
-
-        // Adiciona um novo espaço para upload (local)
-        function addNewUploadField() {
-            const uploadSection = document.getElementById("uploadSection");
-            let index = uploadSection.querySelectorAll(".image-container").length;
-
-            const container = document.createElement("div");
-            container.classList.add("image-container");
-            container.id = `image-container-${index}`;
-
-            const dateLabel = document.createElement("span");
-            dateLabel.classList.add("date-label");
-            dateLabel.id = `dateLabel-${index}`;
-
-            const fileWrapper = document.createElement("div");
-            fileWrapper.classList.add("file-input-wrapper");
-
-            const fileInput = document.createElement("input");
-            fileInput.type = "file";
-            fileInput.id = `file-${index}`;
-            fileInput.accept = "image/*";
-            fileInput.onchange = function () {
-                handleFileSelect(this, index);
-            };
-
-            const customButton = document.createElement("button");
-            customButton.classList.add("custom-file-button");
-            customButton.type = "button";
-            customButton.textContent = "Carregar Imagem";
-            customButton.onclick = function() {
-                triggerFileSelect(index);
-            };
-
-            fileWrapper.appendChild(fileInput);
-            fileWrapper.appendChild(customButton);
-
-            const imgPreview = document.createElement("img");
-            imgPreview.id = `preview-${index}`;
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.classList.add("delete-image-button");
-            deleteBtn.id = `deleteButton-${index}`;
-            deleteBtn.textContent = "Excluir Imagem";
-            deleteBtn.onclick = function() {
-                deleteImage(index);
-            };
-
-            container.appendChild(dateLabel);
-            container.appendChild(fileWrapper);
-            container.appendChild(imgPreview);
-            container.appendChild(deleteBtn);
-
-            uploadSection.appendChild(container);
-        }
-
-        // Função para adicionar uma nova linha na tabela
-        function addRow() {
-            const table = document.getElementById("medicationTable").getElementsByTagName("tbody")[0];
-            const newRow = table.insertRow();
-
-            newRow.innerHTML = `
-                <td><input type="text" class="table-input" placeholder="Remédio e Dosagem (mg)"></td>
-                <td><input type="text" class="table-input" placeholder="Como tomar"></td>
-                <td><input type="checkbox"></td>
-            `;
-            // Salvar imediatamente
-            saveTableDataToDB();
-        }
-
-        // Função para excluir linhas selecionadas
-        function deleteSelected() {
-            const table = document.getElementById("medicationTable").getElementsByTagName("tbody")[0];
-            const rows = table.rows;
-
-            for (let i = rows.length - 1; i >= 0; i--) {
-                const checkbox = rows[i].querySelector("input[type='checkbox']");
-                if (checkbox && checkbox.checked) {
-                    table.deleteRow(i);
-                }
-            }
-            saveTableDataToDB();
-        }
-
-        // Sempre que alguém alterar algo na tabela, podemos salvar novamente.
-        // Você pode ligar esse evento de várias formas, ex. oninput nos <input table-input> etc.
-
-        /* --- REGISTRO DO SERVICE WORKER (INSERIDO AO FINAL DO SCRIPT) --- */
-        if ('serviceWorker' in navigator) {
-          window.addEventListener('load', () => {
-            navigator.serviceWorker
-              .register('./service-worker.js')
-              .then(() => console.log('Service Worker registrado!'))
-              .catch(err => console.error('Erro no registro do Service Worker:', err));
-          });
-        }
     </script>
 </body>
 </html>
