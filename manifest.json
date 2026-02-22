@@ -1,11 +1,10 @@
 {
-  "name": "Remédios do Dia",
-  "short_name": "Remédios",
+  "name": "Remédio Uso Contínuo",
+  "short_name": "Uso Contínuo",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "Remedio dia.png.jpg",
