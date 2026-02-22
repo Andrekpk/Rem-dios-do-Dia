@@ -38,7 +38,7 @@
             cursor: pointer;
         }
         .pix-btn {
-            background-color: #00A859 !important; /* cor oficial Pix */
+            background-color: #00A859 !important;
             color: white;
             font-size: 18px;
             padding: 16px;
@@ -47,6 +47,17 @@
             width: 100%;
             border: none;
             cursor: pointer;
+        }
+        .lgpd-box {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 18px;
+            margin: 25px 0 30px 0;
+            font-size: 14.5px;
+            color: #444;
+            line-height: 1.5;
+            text-align: center;
         }
         .donation-text {
             text-align: center;
@@ -117,21 +128,29 @@
     <h1>Medicamentos de Uso Contínuo (MUC)</h1>
     <p class="subtitle">📸 Tire foto da receita ou da caixa<br><strong>Guarde aqui seus medicamentos de uso contínuo (MUC)</strong></p>
 
-    <!-- Compartilhar todas -->
-    <button onclick="shareAllPhotos()" class="share-all-btn">
-        📤 Compartilhar TODAS as Fotos no WhatsApp
-    </button>
-
     <div id="uploadSection">
         <!-- Fotos aparecem aqui -->
     </div>
 
-    <!-- DOAÇÃO PIX - SOMENTE ISSO -->
+    <!-- BOTÃO COMPARTILHAR (agora acima do Pix) -->
+    <button onclick="shareAllPhotos()" class="share-all-btn">
+        📤 Compartilhar TODAS as Fotos no WhatsApp
+    </button>
+
+    <!-- DOAÇÃO PIX -->
     <button onclick="doarPix()" class="pix-btn">
         ❤️ Apoiar com Pix – Qualquer valor
     </button>
+
+    <!-- DISCLAIMER LGPD -->
+    <div class="lgpd-box">
+        ✅ <strong>Este app é 100% GRÁTIS</strong> e armazena todas as fotos <strong>APENAS no seu celular</strong>.<br>
+        Você decide com quem compartilhar (filhos, médico, hospital...).<br>
+        Não enviamos nenhum dado para a internet.<br>
+        Tudo conforme a <strong>LGPD</strong>. Use com total tranquilidade ❤️
+    </div>
+
     <p class="donation-text">
-        App 100% grátis para você e sua família.<br>
         Sua doação ajuda a manter e melhorar o app para mais pessoas ❤️
     </p>
 
@@ -277,7 +296,6 @@
           }
         }
 
-        // ==================== DOAÇÃO PIX ====================
         function doarPix() {
           const chavePix = "46991159004";
           navigator.clipboard.writeText(chavePix).then(() => {
@@ -286,7 +304,6 @@
             alert(`Chave Pix: 46991159004\n\nNúmero: (46) 99115-9004\n\nCopie manualmente e doe no seu banco.\nObrigado! ❤️`);
           });
         }
-        // ====================================================
 
         window.addEventListener('load', () => {
           openDatabase();
