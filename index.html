@@ -37,6 +37,23 @@
             border: none;
             cursor: pointer;
         }
+        .pix-btn {
+            background-color: #00A859 !important; /* cor oficial Pix */
+            color: white;
+            font-size: 18px;
+            padding: 16px;
+            margin: 20px 0;
+            border-radius: 10px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+        }
+        .donation-text {
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+            margin: 10px 0 30px 0;
+        }
         .logo-top, .logo-bottom {
             text-align: center;
             margin: 15px 0;
@@ -100,7 +117,7 @@
     <h1>Medicamentos de Uso Contínuo (MUC)</h1>
     <p class="subtitle">📸 Tire foto da receita ou da caixa<br><strong>Guarde aqui seus medicamentos de uso contínuo (MUC)</strong></p>
 
-    <!-- BOTÃO NOVO: COMPARTILHAR TODAS DE UMA VEZ -->
+    <!-- Compartilhar todas -->
     <button onclick="shareAllPhotos()" class="share-all-btn">
         📤 Compartilhar TODAS as Fotos no WhatsApp
     </button>
@@ -108,6 +125,15 @@
     <div id="uploadSection">
         <!-- Fotos aparecem aqui -->
     </div>
+
+    <!-- DOAÇÃO PIX - SOMENTE ISSO -->
+    <button onclick="doarPix()" class="pix-btn">
+        ❤️ Apoiar com Pix – Qualquer valor
+    </button>
+    <p class="donation-text">
+        App 100% grátis para você e sua família.<br>
+        Sua doação ajuda a manter e melhorar o app para mais pessoas ❤️
+    </p>
 
     <!-- LOGO INFERIOR -->
     <div class="logo-bottom">
@@ -227,34 +253,38 @@
           section.appendChild(container);
         }
 
-        // ==================== BOTÃO NOVO ====================
         async function shareAllPhotos() {
           const images = document.querySelectorAll('#uploadSection img');
           if (images.length === 0) {
             alert("Nenhuma foto salva ainda!");
             return;
           }
-
           try {
             const files = [];
             for (let img of images) {
               const res = await fetch(img.src);
               const blob = await res.blob();
               const fileName = `MUC_${new Date().toISOString().slice(0,10)}.jpg`;
-              const file = new File([blob], fileName, { type: 'image/jpeg' });
-              files.push(file);
+              files.push(new File([blob], fileName, { type: 'image/jpeg' }));
             }
-
             await navigator.share({
               title: 'Medicamentos de Uso Contínuo (MUC)',
               text: 'Fotos das minhas receitas e medicamentos de uso contínuo.\nCompartilhando conforme meu desejo.',
               files: files
             });
           } catch (err) {
-            if (err.name !== 'AbortError') {
-              alert('Compartilhamento cancelado ou não disponível neste momento.');
-            }
+            if (err.name !== 'AbortError') alert('Compartilhamento cancelado.');
           }
+        }
+
+        // ==================== DOAÇÃO PIX ====================
+        function doarPix() {
+          const chavePix = "46991159004";
+          navigator.clipboard.writeText(chavePix).then(() => {
+            alert(`✅ Chave Pix copiada!\n\nNúmero: (46) 99115-9004\n\nAbra seu app do banco, cole a chave e doe o valor que quiser.\n\nMuito obrigado pelo apoio! ❤️\nDr. Andre`);
+          }).catch(() => {
+            alert(`Chave Pix: 46991159004\n\nNúmero: (46) 99115-9004\n\nCopie manualmente e doe no seu banco.\nObrigado! ❤️`);
+          });
         }
         // ====================================================
 
