@@ -90,6 +90,16 @@
             margin: 10px auto;
             border-radius: 8px;
         }
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .button-row button {
+            flex: 1;
+            padding: 14px 10px;
+            font-size: 16px;
+        }
         button {
             padding: 14px 20px;
             background-color: #007bff;
@@ -230,21 +240,33 @@
           const container = document.createElement("div");
           container.className = "image-container";
 
-          const fileWrapper = document.createElement("div");
-          fileWrapper.style.textAlign = "center";
+          const buttonRow = document.createElement("div");
+          buttonRow.className = "button-row";
 
-          const input = document.createElement("input");
-          input.type = "file";
-          input.accept = "image/*";
-          input.capture = "environment";
-          input.style.display = "none";
+          // Botão Câmera
+          const cameraInput = document.createElement("input");
+          cameraInput.type = "file";
+          cameraInput.accept = "image/*";
+          cameraInput.capture = "environment";
+          cameraInput.style.display = "none";
 
-          const btn = document.createElement("button");
-          btn.textContent = "📷 Tirar Foto da Receita";
-          btn.onclick = () => input.click();
+          const cameraBtn = document.createElement("button");
+          cameraBtn.textContent = "📷 Tirar Foto da Receita";
+          cameraBtn.onclick = () => cameraInput.click();
 
-          input.onchange = function() {
-            const file = this.files[0];
+          // Botão Galeria
+          const galleryInput = document.createElement("input");
+          galleryInput.type = "file";
+          galleryInput.accept = "image/*";
+          galleryInput.style.display = "none";
+
+          const galleryBtn = document.createElement("button");
+          galleryBtn.textContent = "📁 Adicionar da Galeria";
+          galleryBtn.onclick = () => galleryInput.click();
+
+          // Função comum para os dois
+          const handleFile = function(input) {
+            const file = input.files[0];
             if (file) {
               const reader = new FileReader();
               reader.onload = function(e) {
@@ -258,9 +280,14 @@
             }
           };
 
-          fileWrapper.appendChild(input);
-          fileWrapper.appendChild(btn);
-          container.appendChild(fileWrapper);
+          cameraInput.onchange = () => handleFile(cameraInput);
+          galleryInput.onchange = () => handleFile(galleryInput);
+
+          buttonRow.appendChild(cameraBtn);
+          buttonRow.appendChild(galleryBtn);
+          container.appendChild(buttonRow);
+          container.appendChild(cameraInput);
+          container.appendChild(galleryInput);
           section.appendChild(container);
         }
 
