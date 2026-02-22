@@ -1,20 +1,16 @@
 {
-  "name": "Remedio do Dia",
-  "short_name": "Remedio do Dia",
-  "start_url": "./index.html",
+  "name": "Remédios do Dia",
+  "short_name": "Remédios",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icone-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icone-512.png",
+      "src": "Remedio dia.png.jpg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ]
 }
