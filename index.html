@@ -13,7 +13,7 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            background-color: #f9f9f9;
+            background-color: #ffffff;
         }
         h1 {
             text-align: center;
@@ -29,6 +29,14 @@
         .logo-top, .logo-bottom {
             text-align: center;
             margin: 15px 0;
+        }
+        .logo-top img {
+            max-height: 150px;
+            background: transparent;
+        }
+        .logo-bottom img {
+            max-height: 95px;      /* ← reduzido conforme pedido */
+            background: transparent;
         }
         .image-container {
             border: 1px solid #ccc;
@@ -73,9 +81,9 @@
 </head>
 <body>
 
-    <!-- LOGO SUPERIOR -->
+    <!-- LOGO SUPERIOR (novo nome com fundo transparente) -->
     <div class="logo-top">
-        <img src="Design sem nome.png.jpeg" alt="Logo Topo" style="max-height: 150px;">
+        <img src="Design_sem_nome.png-removebg-preview.png" alt="Logo Topo">
     </div>
 
     <h1>Medicamentos de Uso Contínuo (MUC)</h1>
@@ -85,9 +93,9 @@
         <!-- Fotos aparecem aqui -->
     </div>
 
-    <!-- LOGO INFERIOR -->
+    <!-- LOGO INFERIOR (clínica Geriatria - reduzido) -->
     <div class="logo-bottom">
-        <img src="Logo.png" alt="Logo Rodapé" style="max-height: 150px;">
+        <img src="Logo.png" alt="Logo Rodapé">
     </div>
 
     <script>
