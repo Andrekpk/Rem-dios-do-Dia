@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
+<head><!-- MELHORIA PARA IPHONE -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Remédios do Dia">
+    <link rel="apple-touch-icon" href="Remedio dia.png.jpg">  <!-- já tem, ótimo -->
     <meta charset="UTF-8">
     <title>Remedio do Dia</title> <!-- Título da página (pode ajustar se quiser) -->
     <style>
@@ -157,7 +162,7 @@
 
             <!-- ENVOLTÓRIO para esconder input file e mostrar botão custom -->
             <div class="file-input-wrapper">
-                <input type="file" id="file-0" accept="image/*" onchange="handleFileSelect(this, 0)">
+             <input type="file" id="file-0" accept="image/*" capture="environment" onchange="handleFileSelect(this, 0)">
                 <button class="custom-file-button" type="button" onclick="triggerFileSelect(0)">
                     Carregar Imagem
                 </button>
